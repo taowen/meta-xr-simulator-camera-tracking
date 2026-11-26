@@ -59,7 +59,7 @@ carries the fixes, against `zrax/pycdc` @ `b428976`:
 | `selftest` | 293 | no | 7 |
 | `session_recorder` | 429 | no | 23 |
 
-"gaps" counts the markers Decompyle++ leaves where it gave up
+Line counts exclude the 11-line provenance header. "gaps" counts the markers Decompyle++ leaves where it gave up
 (`# WARNING: Decompyle incomplete`, `<NODE:n>`). Each file states its own status in
 its header, and `python tools/decompile.py ...` reprints this table.
 
