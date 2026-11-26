@@ -1,0 +1,102 @@
+# server/pinch.py:109-127  _image_gaps
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  109  MAKE_CELL(image_points)
+  117  LOAD_DEREF(image_points); POP_JUMP_IF_NONE(to 62); LOAD_GLOBAL(NULL + len); LOAD_DEREF(image_points); CALL; LOAD_GLOBAL(NULL + max); LOAD_GLOBAL(_MP_FINGER_TIPS); CALL; COMPARE_OP(<=); POP_JUMP_IF_FALSE(to 64)
+  118  RETURN_CONST(None)
+  120  LOAD_CONST(('i', 'int', 'return', 'tuple[float, float]')); LOAD_CLOSURE(image_points); BUILD_TUPLE; LOAD_CONST(<code object at at 0x000001E864809BD0, file "server\pinch.py", line 120>); MAKE_FUNCTION(annotations, closure); STORE_FAST(at)
+  123  LOAD_GLOBAL(NULL + math); LOAD_ATTR(dist); PUSH_NULL; LOAD_FAST(at); LOAD_GLOBAL(_MP_WRIST); CALL; PUSH_NULL; LOAD_FAST(at); LOAD_GLOBAL(_MP_MIDDLE_MCP); CALL; CALL; STORE_FAST(palm)
+  124  LOAD_GLOBAL(NULL + math); LOAD_ATTR(isfinite); LOAD_FAST(palm); CALL; POP_JUMP_IF_FALSE(to 212); LOAD_FAST(palm); LOAD_CONST(0.0); COMPARE_OP(<=); POP_JUMP_IF_FALSE(to 214)
+  125  RETURN_CONST(None)
+  126  PUSH_NULL; LOAD_FAST(at); LOAD_GLOBAL(_MP_THUMB_TIP); CALL; STORE_FAST(thumb)
+  127  LOAD_GLOBAL(_MP_FINGER_TIPS); GET_ITER; LOAD_FAST_AND_CLEAR(tip); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 328); STORE_FAST(tip); LOAD_GLOBAL(NULL + math); LOAD_ATTR(dist); LOAD_FAST(thumb); PUSH_NULL; LOAD_FAST(at); LOAD_FAST(tip); CALL; CALL; LOAD_FAST(palm); BINARY_OP(/); LIST_APPEND; JUMP_BACKWARD(to 258); END_FOR; SWAP; STORE_FAST(tip); RETURN_VALUE; SWAP; POP_TOP; SWAP; STORE_FAST(tip); RERAISE
+
+==============================================================================
+verbatim dis listing: server/pinch.py:109-127 _image_gaps
+==============================================================================
+              0 MAKE_CELL                0 (image_points)
+
+109           2 RESUME                   0
+
+117           4 LOAD_DEREF               0 (image_points)
+              6 POP_JUMP_IF_NONE        27 (to 62)
+              8 LOAD_GLOBAL              1 (NULL + len)
+             18 LOAD_DEREF               0 (image_points)
+             20 CALL                     1
+             28 LOAD_GLOBAL              3 (NULL + max)
+             38 LOAD_GLOBAL              4 (_MP_FINGER_TIPS)
+             48 CALL                     1
+             56 COMPARE_OP              26 (<=)
+             60 POP_JUMP_IF_FALSE        1 (to 64)
+
+118     >>   62 RETURN_CONST             1 (None)
+
+120     >>   64 LOAD_CONST               4 (('i', 'int', 'return', 'tuple[float, float]'))
+             66 LOAD_CLOSURE             0 (image_points)
+             68 BUILD_TUPLE              1
+             70 LOAD_CONST               2 (<code object at at 0x000001E864809BD0, file "server\pinch.py", line 120>)
+             72 MAKE_FUNCTION           12 (annotations, closure)
+             74 STORE_FAST               1 (at)
+
+123          76 LOAD_GLOBAL              7 (NULL + math)
+             86 LOAD_ATTR                8 (dist)
+            106 PUSH_NULL
+            108 LOAD_FAST                1 (at)
+            110 LOAD_GLOBAL             10 (_MP_WRIST)
+            120 CALL                     1
+            128 PUSH_NULL
+            130 LOAD_FAST                1 (at)
+            132 LOAD_GLOBAL             12 (_MP_MIDDLE_MCP)
+            142 CALL                     1
+            150 CALL                     2
+            158 STORE_FAST               2 (palm)
+
+124         160 LOAD_GLOBAL              7 (NULL + math)
+            170 LOAD_ATTR               14 (isfinite)
+            190 LOAD_FAST                2 (palm)
+            192 CALL                     1
+            200 POP_JUMP_IF_FALSE        5 (to 212)
+            202 LOAD_FAST                2 (palm)
+            204 LOAD_CONST               3 (0.0)
+            206 COMPARE_OP              26 (<=)
+            210 POP_JUMP_IF_FALSE        1 (to 214)
+
+125     >>  212 RETURN_CONST             1 (None)
+
+126     >>  214 PUSH_NULL
+            216 LOAD_FAST                1 (at)
+            218 LOAD_GLOBAL             16 (_MP_THUMB_TIP)
+            228 CALL                     1
+            236 STORE_FAST               3 (thumb)
+
+127         238 LOAD_GLOBAL              4 (_MP_FINGER_TIPS)
+            248 GET_ITER
+            250 LOAD_FAST_AND_CLEAR      4 (tip)
+            252 SWAP                     2
+            254 BUILD_LIST               0
+            256 SWAP                     2
+        >>  258 FOR_ITER                33 (to 328)
+            262 STORE_FAST               4 (tip)
+            264 LOAD_GLOBAL              7 (NULL + math)
+            274 LOAD_ATTR                8 (dist)
+            294 LOAD_FAST                3 (thumb)
+            296 PUSH_NULL
+            298 LOAD_FAST                1 (at)
+            300 LOAD_FAST                4 (tip)
+            302 CALL                     1
+            310 CALL                     2
+            318 LOAD_FAST                2 (palm)
+            320 BINARY_OP               11 (/)
+            324 LIST_APPEND              2
+            326 JUMP_BACKWARD           35 (to 258)
+        >>  328 END_FOR
+            330 SWAP                     2
+            332 STORE_FAST               4 (tip)
+            334 RETURN_VALUE
+        >>  336 SWAP                     2
+            338 POP_TOP
+            340 SWAP                     2
+            342 STORE_FAST               4 (tip)
+            344 RERAISE                  0
+ExceptionTable:
+  254 to 328 -> 336 [2]

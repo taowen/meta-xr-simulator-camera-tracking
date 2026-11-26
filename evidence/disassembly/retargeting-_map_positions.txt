@@ -1,0 +1,250 @@
+# server/retargeting.py:281-330  _map_positions
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  292  LOAD_GLOBAL(NULL + np); LOAD_ATTR(array); LOAD_FAST(landmarks); LOAD_GLOBAL(np); LOAD_ATTR(float64); KW_NAMES(('dtype',)); CALL; STORE_FAST(lm)
+  293  LOAD_GLOBAL(NULL + np); LOAD_ATTR(zeros); LOAD_GLOBAL(XR_HAND_JOINT_COUNT); LOAD_CONST(3); BUILD_TUPLE; LOAD_GLOBAL(np); LOAD_ATTR(float64); KW_NAMES(('dtype',)); CALL; STORE_FAST(positions)
+  296  BUILD_MAP; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; MAP_ADD; BUILD_MAP; DICT_UPDATE; STORE_FAST(direct_map)
+  297  LOAD_GLOBAL(WRIST); LOAD_GLOBAL(MP_WRIST)
+  298  LOAD_GLOBAL(THUMB_METACARPAL); LOAD_GLOBAL(MP_THUMB_CMC)
+  299  LOAD_GLOBAL(THUMB_PROXIMAL); LOAD_GLOBAL(MP_THUMB_MCP)
+  300  LOAD_GLOBAL(THUMB_DISTAL); LOAD_GLOBAL(MP_THUMB_IP)
+  301  LOAD_GLOBAL(THUMB_TIP); LOAD_GLOBAL(MP_THUMB_TIP)
+  302  LOAD_GLOBAL(INDEX_PROXIMAL); LOAD_GLOBAL(MP_INDEX_MCP)
+  303  LOAD_GLOBAL(INDEX_INTERMEDIATE); LOAD_GLOBAL(MP_INDEX_PIP)
+  304  LOAD_GLOBAL(INDEX_DISTAL); LOAD_GLOBAL(MP_INDEX_DIP)
+  305  LOAD_GLOBAL(INDEX_TIP); LOAD_GLOBAL(MP_INDEX_TIP)
+  306  LOAD_GLOBAL(MIDDLE_PROXIMAL); LOAD_GLOBAL(MP_MIDDLE_MCP)
+  307  LOAD_GLOBAL(MIDDLE_INTERMEDIATE); LOAD_GLOBAL(MP_MIDDLE_PIP)
+  308  LOAD_GLOBAL(MIDDLE_DISTAL); LOAD_GLOBAL(MP_MIDDLE_DIP)
+  309  LOAD_GLOBAL(MIDDLE_TIP); LOAD_GLOBAL(MP_MIDDLE_TIP)
+  310  LOAD_GLOBAL(RING_PROXIMAL); LOAD_GLOBAL(MP_RING_MCP)
+  311  LOAD_GLOBAL(RING_INTERMEDIATE); LOAD_GLOBAL(MP_RING_PIP)
+  312  LOAD_GLOBAL(RING_DISTAL); LOAD_GLOBAL(MP_RING_DIP)
+  313  LOAD_GLOBAL(RING_TIP); LOAD_GLOBAL(MP_RING_TIP)
+  314  LOAD_GLOBAL(LITTLE_PROXIMAL); LOAD_GLOBAL(MP_PINKY_MCP)
+  315  LOAD_GLOBAL(LITTLE_INTERMEDIATE); LOAD_GLOBAL(MP_PINKY_PIP)
+  316  LOAD_GLOBAL(LITTLE_DISTAL); LOAD_GLOBAL(MP_PINKY_DIP)
+  317  LOAD_GLOBAL(LITTLE_TIP); LOAD_GLOBAL(MP_PINKY_TIP)
+  320  LOAD_FAST(direct_map); LOAD_ATTR(NULL|self + items); CALL; GET_ITER; FOR_ITER(to 686); UNPACK_SEQUENCE; STORE_FAST(xr_idx); STORE_FAST(mp_idx); END_FOR
+  321  LOAD_FAST(lm); LOAD_FAST(mp_idx); BINARY_SUBSCR; LOAD_FAST(positions); LOAD_FAST(xr_idx); STORE_SUBSCR; JUMP_BACKWARD(to 656)
+  324  LOAD_FAST(lm); LOAD_GLOBAL(MP_WRIST); BINARY_SUBSCR; LOAD_FAST(lm); LOAD_GLOBAL(MP_MIDDLE_MCP); BINARY_SUBSCR; BINARY_OP(+); LOAD_CONST(2.0); BINARY_OP(/); LOAD_FAST(positions); LOAD_GLOBAL(PALM); STORE_SUBSCR
+  325  LOAD_FAST(lm); LOAD_GLOBAL(MP_WRIST); BINARY_SUBSCR; LOAD_FAST(lm); LOAD_GLOBAL(MP_INDEX_MCP); BINARY_SUBSCR; BINARY_OP(+); LOAD_CONST(2.0); BINARY_OP(/); LOAD_FAST(positions); LOAD_GLOBAL(INDEX_METACARPAL); STORE_SUBSCR
+  326  LOAD_FAST(lm); LOAD_GLOBAL(MP_WRIST); BINARY_SUBSCR; LOAD_FAST(lm); LOAD_GLOBAL(MP_MIDDLE_MCP); BINARY_SUBSCR; BINARY_OP(+); LOAD_CONST(2.0); BINARY_OP(/); LOAD_FAST(positions); LOAD_GLOBAL(MIDDLE_METACARPAL); STORE_SUBSCR
+  327  LOAD_FAST(lm); LOAD_GLOBAL(MP_WRIST); BINARY_SUBSCR; LOAD_FAST(lm); LOAD_GLOBAL(MP_RING_MCP); BINARY_SUBSCR; BINARY_OP(+); LOAD_CONST(2.0); BINARY_OP(/); LOAD_FAST(positions); LOAD_GLOBAL(RING_METACARPAL); STORE_SUBSCR
+  328  LOAD_FAST(lm); LOAD_GLOBAL(MP_WRIST); BINARY_SUBSCR; LOAD_FAST(lm); LOAD_GLOBAL(MP_PINKY_MCP); BINARY_SUBSCR; BINARY_OP(+); LOAD_CONST(2.0); BINARY_OP(/); LOAD_FAST(positions); LOAD_GLOBAL(LITTLE_METACARPAL); STORE_SUBSCR
+  330  LOAD_FAST(positions); RETURN_VALUE
+
+==============================================================================
+verbatim dis listing: server/retargeting.py:281-330 _map_positions
+==============================================================================
+281           0 RESUME                   0
+
+292           2 LOAD_GLOBAL              1 (NULL + np)
+             12 LOAD_ATTR                2 (array)
+             32 LOAD_FAST                0 (landmarks)
+             34 LOAD_GLOBAL              0 (np)
+             44 LOAD_ATTR                4 (float64)
+             64 KW_NAMES                 1 (('dtype',))
+             66 CALL                     2
+             74 STORE_FAST               1 (lm)
+
+293          76 LOAD_GLOBAL              1 (NULL + np)
+             86 LOAD_ATTR                6 (zeros)
+            106 LOAD_GLOBAL              8 (XR_HAND_JOINT_COUNT)
+            116 LOAD_CONST               2 (3)
+            118 BUILD_TUPLE              2
+            120 LOAD_GLOBAL              0 (np)
+            130 LOAD_ATTR                4 (float64)
+            150 KW_NAMES                 1 (('dtype',))
+            152 CALL                     2
+            160 STORE_FAST               2 (positions)
+
+296         162 BUILD_MAP                0
+
+297         164 LOAD_GLOBAL             10 (WRIST)
+            174 LOAD_GLOBAL             12 (MP_WRIST)
+
+296         184 MAP_ADD                  1
+
+298         186 LOAD_GLOBAL             14 (THUMB_METACARPAL)
+            196 LOAD_GLOBAL             16 (MP_THUMB_CMC)
+
+296         206 MAP_ADD                  1
+
+299         208 LOAD_GLOBAL             18 (THUMB_PROXIMAL)
+            218 LOAD_GLOBAL             20 (MP_THUMB_MCP)
+
+296         228 MAP_ADD                  1
+
+300         230 LOAD_GLOBAL             22 (THUMB_DISTAL)
+            240 LOAD_GLOBAL             24 (MP_THUMB_IP)
+
+296         250 MAP_ADD                  1
+
+301         252 LOAD_GLOBAL             26 (THUMB_TIP)
+            262 LOAD_GLOBAL             28 (MP_THUMB_TIP)
+
+296         272 MAP_ADD                  1
+
+302         274 LOAD_GLOBAL             30 (INDEX_PROXIMAL)
+            284 LOAD_GLOBAL             32 (MP_INDEX_MCP)
+
+296         294 MAP_ADD                  1
+
+303         296 LOAD_GLOBAL             34 (INDEX_INTERMEDIATE)
+            306 LOAD_GLOBAL             36 (MP_INDEX_PIP)
+
+296         316 MAP_ADD                  1
+
+304         318 LOAD_GLOBAL             38 (INDEX_DISTAL)
+            328 LOAD_GLOBAL             40 (MP_INDEX_DIP)
+
+296         338 MAP_ADD                  1
+
+305         340 LOAD_GLOBAL             42 (INDEX_TIP)
+            350 LOAD_GLOBAL             44 (MP_INDEX_TIP)
+
+296         360 MAP_ADD                  1
+
+306         362 LOAD_GLOBAL             46 (MIDDLE_PROXIMAL)
+            372 LOAD_GLOBAL             48 (MP_MIDDLE_MCP)
+
+296         382 MAP_ADD                  1
+
+307         384 LOAD_GLOBAL             50 (MIDDLE_INTERMEDIATE)
+            394 LOAD_GLOBAL             52 (MP_MIDDLE_PIP)
+
+296         404 MAP_ADD                  1
+
+308         406 LOAD_GLOBAL             54 (MIDDLE_DISTAL)
+            416 LOAD_GLOBAL             56 (MP_MIDDLE_DIP)
+
+296         426 MAP_ADD                  1
+
+309         428 LOAD_GLOBAL             58 (MIDDLE_TIP)
+            438 LOAD_GLOBAL             60 (MP_MIDDLE_TIP)
+
+296         448 MAP_ADD                  1
+
+310         450 LOAD_GLOBAL             62 (RING_PROXIMAL)
+            460 LOAD_GLOBAL             64 (MP_RING_MCP)
+
+296         470 MAP_ADD                  1
+
+311         472 LOAD_GLOBAL             66 (RING_INTERMEDIATE)
+            482 LOAD_GLOBAL             68 (MP_RING_PIP)
+
+296         492 MAP_ADD                  1
+
+312         494 LOAD_GLOBAL             70 (RING_DISTAL)
+            504 LOAD_GLOBAL             72 (MP_RING_DIP)
+
+296         514 MAP_ADD                  1
+
+313         516 LOAD_GLOBAL             74 (RING_TIP)
+            526 LOAD_GLOBAL             76 (MP_RING_TIP)
+
+296         536 MAP_ADD                  1
+
+314         538 LOAD_GLOBAL             78 (LITTLE_PROXIMAL)
+            548 LOAD_GLOBAL             80 (MP_PINKY_MCP)
+
+315         558 LOAD_GLOBAL             82 (LITTLE_INTERMEDIATE)
+            568 LOAD_GLOBAL             84 (MP_PINKY_PIP)
+
+316         578 LOAD_GLOBAL             86 (LITTLE_DISTAL)
+            588 LOAD_GLOBAL             88 (MP_PINKY_DIP)
+
+317         598 LOAD_GLOBAL             90 (LITTLE_TIP)
+            608 LOAD_GLOBAL             92 (MP_PINKY_TIP)
+
+296         618 BUILD_MAP                4
+            620 DICT_UPDATE              1
+            622 STORE_FAST               3 (direct_map)
+
+320         624 LOAD_FAST                3 (direct_map)
+            626 LOAD_ATTR               95 (NULL|self + items)
+            646 CALL                     0
+            654 GET_ITER
+        >>  656 FOR_ITER                13 (to 686)
+            660 UNPACK_SEQUENCE          2
+            664 STORE_FAST               4 (xr_idx)
+            666 STORE_FAST               5 (mp_idx)
+
+321         668 LOAD_FAST                1 (lm)
+            670 LOAD_FAST                5 (mp_idx)
+            672 BINARY_SUBSCR
+            676 LOAD_FAST                2 (positions)
+            678 LOAD_FAST                4 (xr_idx)
+            680 STORE_SUBSCR
+            684 JUMP_BACKWARD           15 (to 656)
+
+320     >>  686 END_FOR
+
+324         688 LOAD_FAST                1 (lm)
+            690 LOAD_GLOBAL             12 (MP_WRIST)
+            700 BINARY_SUBSCR
+            704 LOAD_FAST                1 (lm)
+            706 LOAD_GLOBAL             48 (MP_MIDDLE_MCP)
+            716 BINARY_SUBSCR
+            720 BINARY_OP                0 (+)
+            724 LOAD_CONST               3 (2.0)
+            726 BINARY_OP               11 (/)
+            730 LOAD_FAST                2 (positions)
+            732 LOAD_GLOBAL             96 (PALM)
+            742 STORE_SUBSCR
+
+325         746 LOAD_FAST                1 (lm)
+            748 LOAD_GLOBAL             12 (MP_WRIST)
+            758 BINARY_SUBSCR
+            762 LOAD_FAST                1 (lm)
+            764 LOAD_GLOBAL             32 (MP_INDEX_MCP)
+            774 BINARY_SUBSCR
+            778 BINARY_OP                0 (+)
+            782 LOAD_CONST               3 (2.0)
+            784 BINARY_OP               11 (/)
+            788 LOAD_FAST                2 (positions)
+            790 LOAD_GLOBAL             98 (INDEX_METACARPAL)
+            800 STORE_SUBSCR
+
+326         804 LOAD_FAST                1 (lm)
+            806 LOAD_GLOBAL             12 (MP_WRIST)
+            816 BINARY_SUBSCR
+            820 LOAD_FAST                1 (lm)
+            822 LOAD_GLOBAL             48 (MP_MIDDLE_MCP)
+            832 BINARY_SUBSCR
+            836 BINARY_OP                0 (+)
+            840 LOAD_CONST               3 (2.0)
+            842 BINARY_OP               11 (/)
+            846 LOAD_FAST                2 (positions)
+            848 LOAD_GLOBAL            100 (MIDDLE_METACARPAL)
+            858 STORE_SUBSCR
+
+327         862 LOAD_FAST                1 (lm)
+            864 LOAD_GLOBAL             12 (MP_WRIST)
+            874 BINARY_SUBSCR
+            878 LOAD_FAST                1 (lm)
+            880 LOAD_GLOBAL             64 (MP_RING_MCP)
+            890 BINARY_SUBSCR
+            894 BINARY_OP                0 (+)
+            898 LOAD_CONST               3 (2.0)
+            900 BINARY_OP               11 (/)
+            904 LOAD_FAST                2 (positions)
+            906 LOAD_GLOBAL            102 (RING_METACARPAL)
+            916 STORE_SUBSCR
+
+328         920 LOAD_FAST                1 (lm)
+            922 LOAD_GLOBAL             12 (MP_WRIST)
+            932 BINARY_SUBSCR
+            936 LOAD_FAST                1 (lm)
+            938 LOAD_GLOBAL             80 (MP_PINKY_MCP)
+            948 BINARY_SUBSCR
+            952 BINARY_OP                0 (+)
+            956 LOAD_CONST               3 (2.0)
+            958 BINARY_OP               11 (/)
+            962 LOAD_FAST                2 (positions)
+            964 LOAD_GLOBAL            104 (LITTLE_METACARPAL)
+            974 STORE_SUBSCR
+
+330         978 LOAD_FAST                2 (positions)
+            980 RETURN_VALUE

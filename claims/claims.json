@@ -1,0 +1,828 @@
+{
+  "version": 1,
+  "subject": {
+    "product": "Meta XR Simulator v207.1 (Windows)",
+    "binary": "webcam_tracking_server/webcam_tracking_server.exe",
+    "binary_sha256": "d59aa21863beeaac5e2a70277aa5f40347dced6ad2625dab3fc63a55e529530f",
+    "binary_bytes": 12407739,
+    "payload": "PyInstaller one-file bundle, CPython 3.12 bytecode, 1310 modules in PYZ-00.pyz",
+    "noted": "line numbers are the source positions recorded in each code object's line table"
+  },
+  "models": {
+    "hand_landmarker.task": {
+      "bytes": 7819105,
+      "sha256": "fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1",
+      "source": "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
+    },
+    "face_landmarker.task": {
+      "bytes": 3758596,
+      "sha256": "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff",
+      "source": "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task"
+    }
+  },
+  "claims": [
+    {
+      "id": "hand-tracking-is-mediapipe-handlandmarker",
+      "article": "手部用 MediaPipe HandLandmarker，LIVE_STREAM 模式",
+      "file": "server/mediapipe_detector.py",
+      "function": "MediaPipeDetector.start",
+      "line": 167,
+      "checks": [
+        {
+          "line": 172,
+          "contains": [
+            "LOAD_ATTR(HandLandmarker)",
+            "STORE_FAST(HandLandmarker)"
+          ]
+        },
+        {
+          "line": 177,
+          "contains": [
+            "model_asset_path",
+            "_model_path"
+          ]
+        },
+        {
+          "line": 178,
+          "contains": [
+            "LOAD_ATTR(LIVE_STREAM)"
+          ]
+        },
+        {
+          "line": 185,
+          "contains": [
+            "create_from_options",
+            "STORE_ATTR(_landmarker)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "head-pose-is-mediapipe-facelandmarker",
+      "article": "头部用 MediaPipe FaceLandmarker，LIVE_STREAM 模式，开出 4x4 变换矩阵",
+      "file": "server/head_pose_detector.py",
+      "function": "HeadPoseDetector.start",
+      "line": 268,
+      "checks": [
+        {
+          "line": 273,
+          "contains": [
+            "LOAD_ATTR(FaceLandmarker)",
+            "STORE_FAST(FaceLandmarker)"
+          ]
+        },
+        {
+          "line": 277,
+          "contains": [
+            "output_facial_transformation_matrixes"
+          ]
+        },
+        {
+          "line": 279,
+          "contains": [
+            "LOAD_ATTR(LIVE_STREAM)"
+          ]
+        },
+        {
+          "line": 280,
+          "contains": [
+            "LOAD_CONST(1)"
+          ]
+        },
+        {
+          "line": 284,
+          "contains": [
+            "LOAD_CONST(True)"
+          ]
+        },
+        {
+          "line": 290,
+          "contains": [
+            "create_from_options",
+            "STORE_ATTR(_landmarker)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "camera-pose-solved-first",
+      "article": "先做针孔相机位姿求解，失败才回退",
+      "file": "server/positioning.py",
+      "function": "estimate_hand_placement",
+      "line": 331,
+      "checks": [
+        {
+          "line": 365,
+          "contains": [
+            "solve_camera_pose",
+            "STORE_FAST(pose)"
+          ]
+        },
+        {
+          "line": 366,
+          "contains": [
+            "POP_JUMP_IF_NONE"
+          ]
+        },
+        {
+          "line": 375,
+          "contains": [
+            "apply_reach_gain"
+          ]
+        },
+        {
+          "line": 381,
+          "contains": [
+            "palm-width model"
+          ]
+        },
+        {
+          "line": 385,
+          "contains": [
+            "estimate_stage_position"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "translation-solved-with-lstsq",
+      "article": "21 点投影拟合用 np.linalg.lstsq（含一次按深度加权的最小二乘）",
+      "file": "server/positioning.py",
+      "function": "_solve_translation",
+      "line": 206,
+      "checks": [
+        {
+          "line": 224,
+          "contains": [
+            "focal_length",
+            "LOAD_CONST(0.5)"
+          ]
+        },
+        {
+          "line": 234,
+          "contains": [
+            "lstsq",
+            "LOAD_FAST(a)",
+            "LOAD_FAST(b)"
+          ]
+        },
+        {
+          "line": 240,
+          "contains": [
+            "np",
+            "maximum",
+            "_MIN_POINT_DEPTH_M"
+          ]
+        },
+        {
+          "line": 242,
+          "contains": [
+            "lstsq",
+            "BINARY_OP(*)"
+          ]
+        },
+        {
+          "line": 246,
+          "contains": [
+            "_MAX_CAMERA_DEPTH_M"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "palm-width-depth-fallback",
+      "article": "回退路径的深度偏移由掌宽（归一化图像距离）换算",
+      "file": "server/positioning.py",
+      "function": "_estimate_depth_offset",
+      "line": 148,
+      "checks": [
+        {
+          "line": 157,
+          "contains": [
+            "_palm_width",
+            "STORE_FAST(size)"
+          ]
+        },
+        {
+          "line": 158,
+          "contains": [
+            "reference_hand_size"
+          ]
+        },
+        {
+          "line": 163,
+          "contains": [
+            "BINARY_OP(/)",
+            "STORE_FAST(rel)"
+          ]
+        },
+        {
+          "line": 166,
+          "contains": [
+            "depth_range",
+            "LOAD_CONST(1.0)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "palm-width-is-index-to-pinky-mcp",
+      "article": "“掌宽”取食指根(5)到小指根(17)的图像距离",
+      "file": "server/positioning.py",
+      "function": "_palm_width",
+      "line": 135,
+      "checks": [
+        {
+          "line": 143,
+          "contains": [
+            "_MP_INDEX_MCP"
+          ]
+        },
+        {
+          "line": 144,
+          "contains": [
+            "_MP_PINKY_MCP"
+          ]
+        },
+        {
+          "line": 145,
+          "contains": [
+            "hypot",
+            "BINARY_OP(-)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "landmark-index-table",
+      "article": "MediaPipe 索引常量：腕 0、食指根 5、小指根 17",
+      "file": "server/positioning.py",
+      "function": "<module>",
+      "line": 130,
+      "checks": [
+        {
+          "line": 130,
+          "contains": [
+            "LOAD_CONST(0)",
+            "STORE_NAME(_MP_WRIST)"
+          ]
+        },
+        {
+          "line": 131,
+          "contains": [
+            "LOAD_CONST(5)",
+            "STORE_NAME(_MP_INDEX_MCP)"
+          ]
+        },
+        {
+          "line": 132,
+          "contains": [
+            "LOAD_CONST(17)",
+            "STORE_NAME(_MP_PINKY_MCP)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retarget-21-to-26-joints",
+      "article": "_map_positions：21 个位置直拷（wrist + 每指 4 点），再补 5 个",
+      "file": "server/retargeting.py",
+      "function": "_map_positions",
+      "line": 281,
+      "checks": [
+        {
+          "line": 293,
+          "contains": [
+            "XR_HAND_JOINT_COUNT",
+            "LOAD_CONST(3)"
+          ]
+        },
+        {
+          "line": 296,
+          "count": {
+            "pattern": "MAP_ADD",
+            "min": 17
+          }
+        },
+        {
+          "lines": [
+            297,
+            317
+          ],
+          "count": {
+            "pattern": "LOAD_GLOBAL(MP_",
+            "min": 21
+          }
+        },
+        {
+          "line": 320,
+          "contains": [
+            "direct_map"
+          ]
+        },
+        {
+          "line": 321,
+          "contains": [
+            "STORE_SUBSCR"
+          ]
+        },
+        {
+          "line": 324,
+          "contains": [
+            "MP_WRIST",
+            "MP_MIDDLE_MCP",
+            "LOAD_GLOBAL(PALM)"
+          ]
+        },
+        {
+          "line": 325,
+          "contains": [
+            "MP_INDEX_MCP",
+            "LOAD_GLOBAL(INDEX_METACARPAL)"
+          ]
+        },
+        {
+          "line": 326,
+          "contains": [
+            "MP_MIDDLE_MCP",
+            "LOAD_GLOBAL(MIDDLE_METACARPAL)"
+          ]
+        },
+        {
+          "line": 327,
+          "contains": [
+            "MP_RING_MCP",
+            "LOAD_GLOBAL(RING_METACARPAL)"
+          ]
+        },
+        {
+          "line": 328,
+          "contains": [
+            "MP_PINKY_MCP",
+            "LOAD_GLOBAL(LITTLE_METACARPAL)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openxr-joint-count-26",
+      "article": "OpenXR 手部关节数 26；掌/四指掌骨下标 1/6/11/16/21",
+      "file": "server/retargeting.py",
+      "function": "<module>",
+      "line": 101,
+      "checks": [
+        {
+          "line": 74,
+          "contains": [
+            "LOAD_CONST(0)",
+            "STORE_NAME(PALM)"
+          ]
+        },
+        {
+          "line": 80,
+          "contains": [
+            "LOAD_CONST(6)",
+            "STORE_NAME(INDEX_METACARPAL)"
+          ]
+        },
+        {
+          "line": 85,
+          "contains": [
+            "LOAD_CONST(11)",
+            "STORE_NAME(MIDDLE_METACARPAL)"
+          ]
+        },
+        {
+          "line": 90,
+          "contains": [
+            "LOAD_CONST(16)",
+            "STORE_NAME(RING_METACARPAL)"
+          ]
+        },
+        {
+          "line": 95,
+          "contains": [
+            "LOAD_CONST(21)",
+            "STORE_NAME(LITTLE_METACARPAL)"
+          ]
+        },
+        {
+          "line": 101,
+          "contains": [
+            "LOAD_CONST(26)",
+            "STORE_NAME(XR_HAND_JOINT_COUNT)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "palm-equals-middle-metacarpal",
+      "article": "编号 1 的 palm 与编号 11 的 middle_metacarpal 用了完全相同的公式（腕+中指根的中点）",
+      "file": "server/retargeting.py",
+      "function": "_map_positions",
+      "line": 281,
+      "checks": [
+        {
+          "line": 324,
+          "contains": [
+            "MP_WRIST",
+            "MP_MIDDLE_MCP",
+            "LOAD_CONST(2.0)",
+            "LOAD_GLOBAL(PALM)"
+          ]
+        },
+        {
+          "line": 326,
+          "contains": [
+            "MP_WRIST",
+            "MP_MIDDLE_MCP",
+            "LOAD_CONST(2.0)",
+            "LOAD_GLOBAL(MIDDLE_METACARPAL)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "orientation-from-bone-and-parent-hinge",
+      "article": "朝向：z 取当前骨段方向，x 取上一关节的屈伸轴，再正交化",
+      "file": "server/retargeting.py",
+      "function": "_child_joint_frame",
+      "line": 346,
+      "checks": [
+        {
+          "line": 354,
+          "contains": [
+            "_normalize",
+            "UNARY_NEGATIVE",
+            "STORE_FAST(z_axis)"
+          ]
+        },
+        {
+          "line": 355,
+          "contains": [
+            "parent_frame",
+            "BUILD_SLICE",
+            "STORE_FAST(hinge)"
+          ]
+        },
+        {
+          "line": 356,
+          "contains": [
+            "LOAD_ATTR(dot)",
+            "BINARY_OP(-)",
+            "STORE_FAST(x_axis)"
+          ]
+        },
+        {
+          "line": 358,
+          "contains": [
+            "LOAD_FAST(parent_frame)"
+          ]
+        },
+        {
+          "line": 359,
+          "contains": [
+            "column_stack",
+            "LOAD_ATTR(cross)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "filter-splits-root-and-relative",
+      "article": "整手与局部关节分开滤：先滤掌部参考点，再滤各关节相对参考点的偏移",
+      "file": "server/one_euro_filter.py",
+      "function": "HandJointPositionFilter._filter_with_root",
+      "line": 217,
+      "checks": [
+        {
+          "line": 223,
+          "contains": [
+            "STORE_FAST(raw_root)"
+          ]
+        },
+        {
+          "line": 224,
+          "contains": [
+            "_PALM_JOINTS",
+            "BINARY_OP(/)"
+          ]
+        },
+        {
+          "line": 225,
+          "contains": [
+            "range",
+            "LOAD_CONST(3)"
+          ]
+        },
+        {
+          "line": 248,
+          "contains": [
+            "raw_root",
+            "BINARY_OP(-)"
+          ]
+        },
+        {
+          "line": 249,
+          "contains": [
+            "raw_root",
+            "BINARY_OP(-)"
+          ]
+        },
+        {
+          "line": 250,
+          "contains": [
+            "raw_root",
+            "BINARY_OP(-)"
+          ]
+        },
+        {
+          "line": 253,
+          "contains": [
+            "RETURN_VALUE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "streaming-path-has-no-ik-solve",
+      "article": "滤波结果写回关节后直接出帧，这条路径里没有固定骨长或关节角度求解",
+      "file": "server/hand_tracking_service.py",
+      "function": "_hand_state_from_detection",
+      "line": 218,
+      "checks": [
+        {
+          "line": 243,
+          "contains": [
+            "retarget",
+            "stage_offset"
+          ]
+        },
+        {
+          "line": 248,
+          "contains": [
+            "filter_positions"
+          ]
+        },
+        {
+          "line": 254,
+          "contains": [
+            "filter_positions"
+          ]
+        },
+        {
+          "line": 255,
+          "contains": [
+            "zip",
+            "LOAD_FAST(smoothed)"
+          ]
+        },
+        {
+          "line": 256,
+          "contains": [
+            "STORE_ATTR(x)",
+            "STORE_ATTR(y)",
+            "STORE_ATTR(z)"
+          ]
+        },
+        {
+          "line": 264,
+          "contains": [
+            "_joints_to_hand_state"
+          ]
+        },
+        {
+          "line": null,
+          "absent": [
+            "lstsq",
+            "solve_",
+            "bone_length",
+            "angle"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pinch-combines-image-and-skeleton-gap",
+      "article": "捏合强度取 max(2D 间距, 3D 间距 − 0.06 掌长)，间距按掌长归一化",
+      "file": "server/pinch.py",
+      "function": "pinch_strengths",
+      "line": 130,
+      "checks": [
+        {
+          "line": 151,
+          "contains": [
+            "palm_length",
+            "STORE_FAST(scale)"
+          ]
+        },
+        {
+          "line": 155,
+          "contains": [
+            "_distance",
+            "BINARY_OP(/)"
+          ]
+        },
+        {
+          "line": 157,
+          "contains": [
+            "_image_gaps"
+          ]
+        },
+        {
+          "line": 158,
+          "contains": [
+            "POP_JUMP_IF_NONE"
+          ]
+        },
+        {
+          "line": 162,
+          "contains": [
+            "max",
+            "_SKELETON_SLACK_PALM_FRACTION",
+            "BINARY_OP(-)"
+          ]
+        },
+        {
+          "line": 163,
+          "contains": [
+            "isfinite"
+          ]
+        },
+        {
+          "line": 168,
+          "contains": [
+            "_strength"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pinch-strength-is-linear-ramp",
+      "article": "间距线性映射到 [0, 1]：0.22 掌长算捏住，0.75 掌长算张开",
+      "file": "server/pinch.py",
+      "function": "_strength",
+      "line": 101,
+      "checks": [
+        {
+          "line": 105,
+          "contains": [
+            "_APART_PALM_FRACTION",
+            "_TOUCHING_PALM_FRACTION",
+            "STORE_FAST(span)"
+          ]
+        },
+        {
+          "line": 106,
+          "contains": [
+            "min",
+            "LOAD_CONST(1.0)",
+            "max",
+            "LOAD_CONST(0.0)",
+            "BINARY_OP(/)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pinch-constants",
+      "article": "捏合阈值与 3D 松弛量：0.22 / 0.75 / 0.06 掌长",
+      "file": "server/pinch.py",
+      "function": "<module>",
+      "line": 46,
+      "checks": [
+        {
+          "line": 46,
+          "contains": [
+            "LOAD_CONST(0.22)",
+            "STORE_NAME(_TOUCHING_PALM_FRACTION)"
+          ]
+        },
+        {
+          "line": 47,
+          "contains": [
+            "LOAD_CONST(0.75)",
+            "STORE_NAME(_APART_PALM_FRACTION)"
+          ]
+        },
+        {
+          "line": 67,
+          "contains": [
+            "LOAD_CONST(0.06)",
+            "STORE_NAME(_SKELETON_SLACK_PALM_FRACTION)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "head-position-pinned-to-origin",
+      "article": "头部平移恒为 0：x、y、z 全写 0.0，只写旋转四元数",
+      "file": "server/hand_tracking_service.py",
+      "function": "_apply_head_pose",
+      "line": 184,
+      "checks": [
+        {
+          "line": 196,
+          "contains": [
+            "LOAD_ATTR(orientation)",
+            "UNPACK_SEQUENCE"
+          ]
+        },
+        {
+          "line": 202,
+          "contains": [
+            "LOAD_CONST(0.0)",
+            "LOAD_ATTR(position)",
+            "STORE_ATTR(x)"
+          ]
+        },
+        {
+          "line": 203,
+          "contains": [
+            "LOAD_CONST(0.0)",
+            "LOAD_ATTR(position)",
+            "STORE_ATTR(y)"
+          ]
+        },
+        {
+          "line": 204,
+          "contains": [
+            "LOAD_CONST(0.0)",
+            "LOAD_ATTR(position)",
+            "STORE_ATTR(z)"
+          ]
+        },
+        {
+          "line": 209,
+          "contains": [
+            "_mirror_head_orientation"
+          ]
+        },
+        {
+          "line": 210,
+          "contains": [
+            "LOAD_ATTR(orientation)",
+            "STORE_ATTR(x)"
+          ]
+        },
+        {
+          "line": 213,
+          "contains": [
+            "LOAD_ATTR(orientation)",
+            "STORE_ATTR(w)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pinch-image-gap-normalized-in-image-plane",
+      "article": "2D 间距在图像平面内用「腕→中指根」距离归一化",
+      "file": "server/pinch.py",
+      "function": "_image_gaps",
+      "line": 109,
+      "checks": [
+        {
+          "line": 123,
+          "contains": [
+            "math",
+            "dist",
+            "_MP_WRIST",
+            "_MP_MIDDLE_MCP",
+            "STORE_FAST(palm)"
+          ]
+        },
+        {
+          "line": 127,
+          "contains": [
+            "math",
+            "dist",
+            "BINARY_OP(/)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pinch-scale-is-3d-palm-length",
+      "article": "3D 间距用腕→中指近节的 3D 距离（掌长）归一化",
+      "file": "server/pinch.py",
+      "function": "palm_length",
+      "line": 87,
+      "checks": [
+        {
+          "line": 95,
+          "contains": [
+            "_distance",
+            "WRIST",
+            "MIDDLE_PROXIMAL"
+          ]
+        },
+        {
+          "line": 98,
+          "contains": [
+            "LOAD_FAST(measured)"
+          ]
+        }
+      ]
+    }
+  ]
+}

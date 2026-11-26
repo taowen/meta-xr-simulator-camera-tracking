@@ -1,0 +1,188 @@
+# server/pinch.py:130-170  pinch_strengths
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  148  LOAD_GLOBAL(NULL + len); LOAD_FAST(joints); CALL; LOAD_GLOBAL(NULL + max); LOAD_GLOBAL(THUMB_TIP); LOAD_GLOBAL(LITTLE_TIP); CALL; COMPARE_OP(<=); POP_JUMP_IF_FALSE(to 68)
+  149  RETURN_CONST(None)
+  151  LOAD_GLOBAL(NULL + palm_length); LOAD_FAST(joints); CALL; STORE_FAST(scale)
+  152  LOAD_FAST(scale); POP_JUMP_IF_NOT_NONE(to 96)
+  153  RETURN_CONST(None)
+  154  LOAD_FAST(joints); LOAD_GLOBAL(THUMB_TIP); BINARY_SUBSCR; STORE_FAST(thumb)
+  155  LOAD_GLOBAL(_FINGER_TIPS); GET_ITER; LOAD_FAST_AND_CLEAR(tip); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 178); STORE_FAST(tip); LOAD_GLOBAL(NULL + _distance); LOAD_FAST(thumb); LOAD_FAST(joints); LOAD_FAST(tip); BINARY_SUBSCR; CALL; LOAD_FAST(scale); BINARY_OP(/); LIST_APPEND; JUMP_BACKWARD(to 134); END_FOR; STORE_FAST(gaps); STORE_FAST(tip); SWAP; STORE_FAST(tip); RERAISE; SWAP; POP_TOP
+  157  LOAD_GLOBAL(NULL + _image_gaps); LOAD_FAST(image_points); CALL; STORE_FAST(image)
+  158  LOAD_FAST(image); POP_JUMP_IF_NONE(to 392)
+  161  LOAD_FAST_AND_CLEAR(seen); LOAD_FAST_AND_CLEAR(gap); SWAP; BUILD_LIST; SWAP; STORE_FAST(gaps); STORE_FAST(seen); STORE_FAST(gap); SWAP; STORE_FAST(gap); STORE_FAST(seen); RERAISE; SWAP; POP_TOP
+  162  LOAD_GLOBAL(NULL + max); LOAD_FAST(seen); LOAD_FAST(gap); LOAD_GLOBAL(_SKELETON_SLACK_PALM_FRACTION); BINARY_OP(-); CALL; JUMP_FORWARD(to 380); LIST_APPEND; JUMP_BACKWARD(to 244)
+  163  LOAD_GLOBAL(NULL + math); LOAD_ATTR(isfinite); LOAD_FAST(gap); CALL; POP_JUMP_IF_FALSE(to 378); LOAD_GLOBAL(NULL + math); LOAD_ATTR(isfinite); LOAD_FAST(seen); CALL; POP_JUMP_IF_FALSE(to 378)
+  164  LOAD_FAST(gap)
+  165  LOAD_GLOBAL(NULL + zip); LOAD_FAST(image); LOAD_FAST(gaps); CALL; GET_ITER; FOR_ITER(to 384); UNPACK_SEQUENCE; STORE_FAST(seen); STORE_FAST(gap); END_FOR
+  168  LOAD_FAST(gaps); GET_ITER; LOAD_FAST_AND_CLEAR(gap); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 434); STORE_FAST(gap); LOAD_GLOBAL(NULL + _strength); LOAD_FAST(gap); CALL; LIST_APPEND; JUMP_BACKWARD(to 404); END_FOR; STORE_FAST(values); STORE_FAST(gap); SWAP; STORE_FAST(gap); RERAISE
+  169  LOAD_GLOBAL(NULL + PinchStrengths); KW_NAMES(('index', 'middle', 'ring', 'little')); CALL; RETURN_VALUE; SWAP; POP_TOP
+  170  LOAD_FAST(values); LOAD_CONST(0); BINARY_SUBSCR; LOAD_FAST(values); LOAD_CONST(1); BINARY_SUBSCR; LOAD_FAST(values); LOAD_CONST(2); BINARY_SUBSCR; LOAD_FAST(values); LOAD_CONST(3); BINARY_SUBSCR
+
+==============================================================================
+verbatim dis listing: server/pinch.py:130-170 pinch_strengths
+==============================================================================
+130           0 RESUME                   0
+
+148           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (joints)
+             14 CALL                     1
+             22 LOAD_GLOBAL              3 (NULL + max)
+             32 LOAD_GLOBAL              4 (THUMB_TIP)
+             42 LOAD_GLOBAL              6 (LITTLE_TIP)
+             52 CALL                     2
+             60 COMPARE_OP              26 (<=)
+             64 POP_JUMP_IF_FALSE        1 (to 68)
+
+149          66 RETURN_CONST             1 (None)
+
+151     >>   68 LOAD_GLOBAL              9 (NULL + palm_length)
+             78 LOAD_FAST                0 (joints)
+             80 CALL                     1
+             88 STORE_FAST               2 (scale)
+
+152          90 LOAD_FAST                2 (scale)
+             92 POP_JUMP_IF_NOT_NONE     1 (to 96)
+
+153          94 RETURN_CONST             1 (None)
+
+154     >>   96 LOAD_FAST                0 (joints)
+             98 LOAD_GLOBAL              4 (THUMB_TIP)
+            108 BINARY_SUBSCR
+            112 STORE_FAST               3 (thumb)
+
+155         114 LOAD_GLOBAL             10 (_FINGER_TIPS)
+            124 GET_ITER
+            126 LOAD_FAST_AND_CLEAR      4 (tip)
+            128 SWAP                     2
+            130 BUILD_LIST               0
+            132 SWAP                     2
+        >>  134 FOR_ITER                20 (to 178)
+            138 STORE_FAST               4 (tip)
+            140 LOAD_GLOBAL             13 (NULL + _distance)
+            150 LOAD_FAST                3 (thumb)
+            152 LOAD_FAST                0 (joints)
+            154 LOAD_FAST                4 (tip)
+            156 BINARY_SUBSCR
+            160 CALL                     2
+            168 LOAD_FAST                2 (scale)
+            170 BINARY_OP               11 (/)
+            174 LIST_APPEND              2
+            176 JUMP_BACKWARD           22 (to 134)
+        >>  178 END_FOR
+            180 STORE_FAST               5 (gaps)
+            182 STORE_FAST               4 (tip)
+
+157         184 LOAD_GLOBAL             15 (NULL + _image_gaps)
+            194 LOAD_FAST                1 (image_points)
+            196 CALL                     1
+            204 STORE_FAST               6 (image)
+
+158         206 LOAD_FAST                6 (image)
+            208 POP_JUMP_IF_NONE        91 (to 392)
+
+165         210 LOAD_GLOBAL             17 (NULL + zip)
+            220 LOAD_FAST                6 (image)
+            222 LOAD_FAST                5 (gaps)
+            224 CALL                     2
+            232 GET_ITER
+
+161         234 LOAD_FAST_AND_CLEAR      7 (seen)
+            236 LOAD_FAST_AND_CLEAR      8 (gap)
+            238 SWAP                     3
+            240 BUILD_LIST               0
+            242 SWAP                     2
+
+165     >>  244 FOR_ITER                68 (to 384)
+            248 UNPACK_SEQUENCE          2
+            252 STORE_FAST               7 (seen)
+            254 STORE_FAST               8 (gap)
+
+163         256 LOAD_GLOBAL             19 (NULL + math)
+            266 LOAD_ATTR               20 (isfinite)
+            286 LOAD_FAST                8 (gap)
+            288 CALL                     1
+            296 POP_JUMP_IF_FALSE       40 (to 378)
+            298 LOAD_GLOBAL             19 (NULL + math)
+            308 LOAD_ATTR               20 (isfinite)
+            328 LOAD_FAST                7 (seen)
+            330 CALL                     1
+            338 POP_JUMP_IF_FALSE       19 (to 378)
+
+162         340 LOAD_GLOBAL              3 (NULL + max)
+            350 LOAD_FAST                7 (seen)
+            352 LOAD_FAST                8 (gap)
+            354 LOAD_GLOBAL             22 (_SKELETON_SLACK_PALM_FRACTION)
+            364 BINARY_OP               10 (-)
+            368 CALL                     2
+            376 JUMP_FORWARD             1 (to 380)
+
+164     >>  378 LOAD_FAST                8 (gap)
+
+162     >>  380 LIST_APPEND              2
+            382 JUMP_BACKWARD           70 (to 244)
+
+165     >>  384 END_FOR
+
+161         386 STORE_FAST               5 (gaps)
+            388 STORE_FAST               7 (seen)
+            390 STORE_FAST               8 (gap)
+
+168     >>  392 LOAD_FAST                5 (gaps)
+            394 GET_ITER
+            396 LOAD_FAST_AND_CLEAR      8 (gap)
+            398 SWAP                     2
+            400 BUILD_LIST               0
+            402 SWAP                     2
+        >>  404 FOR_ITER                13 (to 434)
+            408 STORE_FAST               8 (gap)
+            410 LOAD_GLOBAL             25 (NULL + _strength)
+            420 LOAD_FAST                8 (gap)
+            422 CALL                     1
+            430 LIST_APPEND              2
+            432 JUMP_BACKWARD           15 (to 404)
+        >>  434 END_FOR
+            436 STORE_FAST               9 (values)
+            438 STORE_FAST               8 (gap)
+
+169         440 LOAD_GLOBAL             27 (NULL + PinchStrengths)
+
+170         450 LOAD_FAST                9 (values)
+            452 LOAD_CONST               2 (0)
+            454 BINARY_SUBSCR
+            458 LOAD_FAST                9 (values)
+            460 LOAD_CONST               3 (1)
+            462 BINARY_SUBSCR
+            466 LOAD_FAST                9 (values)
+            468 LOAD_CONST               4 (2)
+            470 BINARY_SUBSCR
+            474 LOAD_FAST                9 (values)
+            476 LOAD_CONST               5 (3)
+            478 BINARY_SUBSCR
+
+169         482 KW_NAMES                 6 (('index', 'middle', 'ring', 'little'))
+            484 CALL                     4
+            492 RETURN_VALUE
+        >>  494 SWAP                     2
+            496 POP_TOP
+
+155         498 SWAP                     2
+            500 STORE_FAST               4 (tip)
+            502 RERAISE                  0
+        >>  504 SWAP                     2
+            506 POP_TOP
+
+161         508 SWAP                     3
+            510 STORE_FAST               8 (gap)
+            512 STORE_FAST               7 (seen)
+            514 RERAISE                  0
+        >>  516 SWAP                     2
+            518 POP_TOP
+
+168         520 SWAP                     2
+            522 STORE_FAST               8 (gap)
+            524 RERAISE                  0
+ExceptionTable:
+  130 to 178 -> 494 [2]
+  240 to 384 -> 504 [3]
+  400 to 434 -> 516 [2]

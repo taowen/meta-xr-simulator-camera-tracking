@@ -1,0 +1,67 @@
+# server/retargeting.py:346-359  _child_joint_frame
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  354  LOAD_GLOBAL(NULL + _normalize); LOAD_FAST(bone_dir); UNARY_NEGATIVE; CALL; STORE_FAST(z_axis)
+  355  LOAD_FAST(parent_frame); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(0); BUILD_TUPLE; BINARY_SUBSCR; STORE_FAST(hinge)
+  356  LOAD_GLOBAL(NULL + _normalize); LOAD_FAST(hinge); LOAD_GLOBAL(NULL + np); LOAD_ATTR(dot); LOAD_FAST(hinge); LOAD_FAST(z_axis); CALL; LOAD_FAST(z_axis); BINARY_OP(*); BINARY_OP(-); CALL; STORE_FAST(x_axis)
+  357  LOAD_FAST(z_axis); LOAD_ATTR(NULL|self + any); CALL; POP_JUMP_IF_FALSE(to 182); LOAD_FAST(x_axis); LOAD_ATTR(NULL|self + any); CALL; POP_JUMP_IF_TRUE(to 186)
+  358  LOAD_FAST(parent_frame); RETURN_VALUE
+  359  LOAD_GLOBAL(NULL + np); LOAD_ATTR(column_stack); LOAD_FAST(x_axis); LOAD_GLOBAL(NULL + np); LOAD_ATTR(cross); LOAD_FAST(z_axis); LOAD_FAST(x_axis); CALL; LOAD_FAST(z_axis); BUILD_LIST; CALL; RETURN_VALUE
+
+==============================================================================
+verbatim dis listing: server/retargeting.py:346-359 _child_joint_frame
+==============================================================================
+346           0 RESUME                   0
+
+354           2 LOAD_GLOBAL              1 (NULL + _normalize)
+             12 LOAD_FAST                1 (bone_dir)
+             14 UNARY_NEGATIVE
+             16 CALL                     1
+             24 STORE_FAST               2 (z_axis)
+
+355          26 LOAD_FAST                0 (parent_frame)
+             28 LOAD_CONST               1 (None)
+             30 LOAD_CONST               1 (None)
+             32 BUILD_SLICE              2
+             34 LOAD_CONST               2 (0)
+             36 BUILD_TUPLE              2
+             38 BINARY_SUBSCR
+             42 STORE_FAST               3 (hinge)
+
+356          44 LOAD_GLOBAL              1 (NULL + _normalize)
+             54 LOAD_FAST                3 (hinge)
+             56 LOAD_GLOBAL              3 (NULL + np)
+             66 LOAD_ATTR                4 (dot)
+             86 LOAD_FAST                3 (hinge)
+             88 LOAD_FAST                2 (z_axis)
+             90 CALL                     2
+             98 LOAD_FAST                2 (z_axis)
+            100 BINARY_OP                5 (*)
+            104 BINARY_OP               10 (-)
+            108 CALL                     1
+            116 STORE_FAST               4 (x_axis)
+
+357         118 LOAD_FAST                2 (z_axis)
+            120 LOAD_ATTR                7 (NULL|self + any)
+            140 CALL                     0
+            148 POP_JUMP_IF_FALSE       16 (to 182)
+            150 LOAD_FAST                4 (x_axis)
+            152 LOAD_ATTR                7 (NULL|self + any)
+            172 CALL                     0
+            180 POP_JUMP_IF_TRUE         2 (to 186)
+
+358     >>  182 LOAD_FAST                0 (parent_frame)
+            184 RETURN_VALUE
+
+359     >>  186 LOAD_GLOBAL              3 (NULL + np)
+            196 LOAD_ATTR                8 (column_stack)
+            216 LOAD_FAST                4 (x_axis)
+            218 LOAD_GLOBAL              3 (NULL + np)
+            228 LOAD_ATTR               10 (cross)
+            248 LOAD_FAST                2 (z_axis)
+            250 LOAD_FAST                4 (x_axis)
+            252 CALL                     2
+            260 LOAD_FAST                2 (z_axis)
+            262 BUILD_LIST               3
+            264 CALL                     1
+            272 RETURN_VALUE

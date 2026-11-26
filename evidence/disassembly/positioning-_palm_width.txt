@@ -1,0 +1,49 @@
+# server/positioning.py:135-145  _palm_width
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  141  LOAD_GLOBAL(NULL + len); LOAD_FAST(image_landmarks); CALL; LOAD_GLOBAL(_MP_PINKY_MCP); COMPARE_OP(<=); POP_JUMP_IF_FALSE(to 40)
+  142  RETURN_CONST(0.0)
+  143  LOAD_FAST(image_landmarks); LOAD_GLOBAL(_MP_INDEX_MCP); BINARY_SUBSCR; UNPACK_SEQUENCE; STORE_FAST(ax); STORE_FAST(ay); STORE_FAST(_)
+  144  LOAD_FAST(image_landmarks); LOAD_GLOBAL(_MP_PINKY_MCP); BINARY_SUBSCR; UNPACK_SEQUENCE; STORE_FAST(bx); STORE_FAST(by); STORE_FAST(_)
+  145  LOAD_GLOBAL(NULL + math); LOAD_ATTR(hypot); LOAD_FAST(ax); LOAD_FAST(bx); BINARY_OP(-); LOAD_FAST(ay); LOAD_FAST(by); BINARY_OP(-); CALL; RETURN_VALUE
+
+==============================================================================
+verbatim dis listing: server/positioning.py:135-145 _palm_width
+==============================================================================
+135           0 RESUME                   0
+
+141           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (image_landmarks)
+             14 CALL                     1
+             22 LOAD_GLOBAL              2 (_MP_PINKY_MCP)
+             32 COMPARE_OP              26 (<=)
+             36 POP_JUMP_IF_FALSE        1 (to 40)
+
+142          38 RETURN_CONST             1 (0.0)
+
+143     >>   40 LOAD_FAST                0 (image_landmarks)
+             42 LOAD_GLOBAL              4 (_MP_INDEX_MCP)
+             52 BINARY_SUBSCR
+             56 UNPACK_SEQUENCE          3
+             60 STORE_FAST               1 (ax)
+             62 STORE_FAST               2 (ay)
+             64 STORE_FAST               3 (_)
+
+144          66 LOAD_FAST                0 (image_landmarks)
+             68 LOAD_GLOBAL              2 (_MP_PINKY_MCP)
+             78 BINARY_SUBSCR
+             82 UNPACK_SEQUENCE          3
+             86 STORE_FAST               4 (bx)
+             88 STORE_FAST               5 (by)
+             90 STORE_FAST               3 (_)
+
+145          92 LOAD_GLOBAL              7 (NULL + math)
+            102 LOAD_ATTR                8 (hypot)
+            122 LOAD_FAST                1 (ax)
+            124 LOAD_FAST                4 (bx)
+            126 BINARY_OP               10 (-)
+            130 LOAD_FAST                2 (ay)
+            132 LOAD_FAST                5 (by)
+            134 BINARY_OP               10 (-)
+            138 CALL                     2
+            146 RETURN_VALUE

@@ -1,0 +1,487 @@
+# server/retargeting.py:1-426  <module>
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+    3  SETUP_ANNOTATIONS; LOAD_CONST('Retarget MediaPipe 21 hand landmarks to OpenXR 26 hand joints.\n\nMediaPipe provides 21 position-only landmarks per hand (hand_world_landmarks,\nin meters). OpenXR requires 26 joints, each with a full 6DoF pose (position +\norientation quaternion) and a radius. This module bridges the two.\n\nKey operations:\n  1. Position mapping: 21 MediaPipe landmarks -> 26 OpenXR joint positions\n     (5 metacarpal joints are synthesized).\n  2. Coordinate system transform: MediaPipe -> OpenXR axis convention.\n  3. Orientation synthesis: Compute quaternion orientations from bone directions.\n  4. Fixed joint radii: Assign reasonable per-joint-type defaults.\n\nCoordinate systems:\n  MediaPipe hand_world_landmarks (right-handed):\n    X: increases toward camera-right (user\'s left in a typical selfie view)\n    Y: increases downward\n    Z: increases toward the camera (away from the screen)\n    Origin: hand geometric center\n\n  OpenXR stage space (right-handed):\n    X: increases to the right\n    Y: increases upward\n    Z: increases backward (toward the user)\n\n  Default transform: (-x, -y, z)\n    - X negated: mirrors so user\'s right = OpenXR +X\n    - Y negated: flips so up = OpenXR +Y\n    - Z preserved: both point "toward the user"\n'); STORE_NAME(__doc__)
+   34  LOAD_CONST(0); LOAD_CONST(('annotations',)); IMPORT_FROM(annotations); STORE_NAME(annotations); POP_TOP
+   36  LOAD_CONST(0); LOAD_CONST(None); STORE_NAME(math)
+   37  LOAD_CONST(0); LOAD_CONST(('dataclass',)); IMPORT_FROM(dataclass); STORE_NAME(dataclass); POP_TOP
+   38  LOAD_CONST(0); LOAD_CONST(('List', 'Optional', 'Tuple')); IMPORT_FROM(List); STORE_NAME(List); IMPORT_FROM(Optional); STORE_NAME(Optional); IMPORT_FROM(Tuple); STORE_NAME(Tuple); POP_TOP
+   40  LOAD_CONST(0); LOAD_CONST(None); STORE_NAME(np)
+   48  LOAD_NAME(dataclass); CALL
+   49  PUSH_NULL; LOAD_BUILD_CLASS; LOAD_CONST(<code object Quaternion at 0x000001E8647E2430, file "server\retargeting.py", line 48>); MAKE_FUNCTION; LOAD_CONST('Quaternion'); CALL; STORE_NAME(Quaternion)
+   56  LOAD_NAME(dataclass); CALL
+   57  PUSH_NULL; LOAD_BUILD_CLASS; LOAD_CONST(<code object Vec3 at 0x000001E8647D93E0, file "server\retargeting.py", line 56>); MAKE_FUNCTION; LOAD_CONST('Vec3'); CALL; STORE_NAME(Vec3)
+   63  LOAD_NAME(dataclass); CALL
+   64  PUSH_NULL; LOAD_BUILD_CLASS; LOAD_CONST(<code object JointPose at 0x000001E8647D9110, file "server\retargeting.py", line 63>); MAKE_FUNCTION; LOAD_CONST('JointPose'); CALL; STORE_NAME(JointPose)
+   74  LOAD_CONST(0); STORE_NAME(PALM)
+   75  LOAD_CONST(1); STORE_NAME(WRIST)
+   76  LOAD_CONST(2); STORE_NAME(THUMB_METACARPAL)
+   77  LOAD_CONST(3); STORE_NAME(THUMB_PROXIMAL)
+   78  LOAD_CONST(4); STORE_NAME(THUMB_DISTAL)
+   79  LOAD_CONST(5); STORE_NAME(THUMB_TIP)
+   80  LOAD_CONST(6); STORE_NAME(INDEX_METACARPAL)
+   81  LOAD_CONST(7); STORE_NAME(INDEX_PROXIMAL)
+   82  LOAD_CONST(8); STORE_NAME(INDEX_INTERMEDIATE)
+   83  LOAD_CONST(9); STORE_NAME(INDEX_DISTAL)
+   84  LOAD_CONST(10); STORE_NAME(INDEX_TIP)
+   85  LOAD_CONST(11); STORE_NAME(MIDDLE_METACARPAL)
+   86  LOAD_CONST(12); STORE_NAME(MIDDLE_PROXIMAL)
+   87  LOAD_CONST(13); STORE_NAME(MIDDLE_INTERMEDIATE)
+   88  LOAD_CONST(14); STORE_NAME(MIDDLE_DISTAL)
+   89  LOAD_CONST(15); STORE_NAME(MIDDLE_TIP)
+   90  LOAD_CONST(16); STORE_NAME(RING_METACARPAL)
+   91  LOAD_CONST(17); STORE_NAME(RING_PROXIMAL)
+   92  LOAD_CONST(18); STORE_NAME(RING_INTERMEDIATE)
+   93  LOAD_CONST(19); STORE_NAME(RING_DISTAL)
+   94  LOAD_CONST(20); STORE_NAME(RING_TIP)
+   95  LOAD_CONST(21); STORE_NAME(LITTLE_METACARPAL)
+   96  LOAD_CONST(22); STORE_NAME(LITTLE_PROXIMAL)
+   97  LOAD_CONST(23); STORE_NAME(LITTLE_INTERMEDIATE)
+   98  LOAD_CONST(24); STORE_NAME(LITTLE_DISTAL)
+   99  LOAD_CONST(25); STORE_NAME(LITTLE_TIP)
+  101  LOAD_CONST(26); STORE_NAME(XR_HAND_JOINT_COUNT)
+  107  LOAD_CONST(0); STORE_NAME(MP_WRIST)
+  108  LOAD_CONST(1); STORE_NAME(MP_THUMB_CMC)
+  109  LOAD_CONST(2); STORE_NAME(MP_THUMB_MCP)
+  110  LOAD_CONST(3); STORE_NAME(MP_THUMB_IP)
+  111  LOAD_CONST(4); STORE_NAME(MP_THUMB_TIP)
+  112  LOAD_CONST(5); STORE_NAME(MP_INDEX_MCP)
+  113  LOAD_CONST(6); STORE_NAME(MP_INDEX_PIP)
+  114  LOAD_CONST(7); STORE_NAME(MP_INDEX_DIP)
+  115  LOAD_CONST(8); STORE_NAME(MP_INDEX_TIP)
+  116  LOAD_CONST(9); STORE_NAME(MP_MIDDLE_MCP)
+  117  LOAD_CONST(10); STORE_NAME(MP_MIDDLE_PIP)
+  118  LOAD_CONST(11); STORE_NAME(MP_MIDDLE_DIP)
+  119  LOAD_CONST(12); STORE_NAME(MP_MIDDLE_TIP)
+  120  LOAD_CONST(13); STORE_NAME(MP_RING_MCP)
+  121  LOAD_CONST(14); STORE_NAME(MP_RING_PIP)
+  122  LOAD_CONST(15); STORE_NAME(MP_RING_DIP)
+  123  LOAD_CONST(16); STORE_NAME(MP_RING_TIP)
+  124  LOAD_CONST(17); STORE_NAME(MP_PINKY_MCP)
+  125  LOAD_CONST(18); STORE_NAME(MP_PINKY_PIP)
+  126  LOAD_CONST(19); STORE_NAME(MP_PINKY_DIP)
+  127  LOAD_CONST(20); STORE_NAME(MP_PINKY_TIP)
+  140  PUSH_NULL; LOAD_NAME(np); LOAD_ATTR(diag); BUILD_LIST; LOAD_CONST((-1.0, -1.0, 1.0)); LIST_EXTEND; CALL; STORE_NAME(DEFAULT_AXIS_REMAP); LOAD_CONST('np.ndarray'); LOAD_NAME(__annotations__); LOAD_CONST('DEFAULT_AXIS_REMAP'); STORE_SUBSCR
+  146  BUILD_LIST; LOAD_CONST((0.017, 0.0222, 0.0201, 0.0127, 0.0101, 0.0091, 0.022, 0.0107, 0.0088, 0.0079, 0.0069, 0.022, 0.0116, 0.0083, 0.0079, 0.0069, 0.0198, 0.0103, 0.0079, 0.0075, 0.0065, 0.0187, 0.0088, 0.007, 0.0067, 0.0056)); LIST_EXTEND; STORE_NAME(_JOINT_RADII); LOAD_CONST('List[float]'); LOAD_NAME(__annotations__); LOAD_CONST('_JOINT_RADII'); STORE_SUBSCR
+  180  BUILD_LIST; STORE_NAME(_FINGER_CHAINS); LOAD_CONST('List[List[int]]'); LOAD_NAME(__annotations__); LOAD_CONST('_FINGER_CHAINS'); STORE_SUBSCR
+  182  LOAD_NAME(THUMB_METACARPAL); LOAD_NAME(THUMB_PROXIMAL); LOAD_NAME(THUMB_DISTAL); LOAD_NAME(THUMB_TIP); BUILD_LIST
+  184  LOAD_NAME(INDEX_METACARPAL); LOAD_NAME(INDEX_PROXIMAL); LOAD_NAME(INDEX_INTERMEDIATE); LOAD_NAME(INDEX_DISTAL); LOAD_NAME(INDEX_TIP); BUILD_LIST
+  186  BUILD_LIST
+  187  LOAD_NAME(MIDDLE_METACARPAL)
+  188  LOAD_NAME(MIDDLE_PROXIMAL)
+  189  LOAD_NAME(MIDDLE_INTERMEDIATE)
+  190  LOAD_NAME(MIDDLE_DISTAL)
+  191  LOAD_NAME(MIDDLE_TIP)
+  194  LOAD_NAME(RING_METACARPAL); LOAD_NAME(RING_PROXIMAL); LOAD_NAME(RING_INTERMEDIATE); LOAD_NAME(RING_DISTAL); LOAD_NAME(RING_TIP); BUILD_LIST
+  196  BUILD_LIST
+  197  LOAD_NAME(LITTLE_METACARPAL)
+  198  LOAD_NAME(LITTLE_PROXIMAL)
+  199  LOAD_NAME(LITTLE_INTERMEDIATE)
+  200  LOAD_NAME(LITTLE_DISTAL)
+  201  LOAD_NAME(LITTLE_TIP)
+  210  LOAD_CONST(('v', 'np.ndarray', 'return', 'np.ndarray')); LOAD_CONST(<code object _normalize at 0x000001E86474AAB0, file "server\retargeting.py", line 210>); MAKE_FUNCTION(annotations); STORE_NAME(_normalize)
+  218  LOAD_CONST(('m', 'np.ndarray', 'return', 'Quaternion')); LOAD_CONST(<code object _rotation_matrix_to_quaternion at 0x000001E864052D90, file "server\retargeting.py", line 218>); MAKE_FUNCTION(annotations); STORE_NAME(_rotation_matrix_to_quaternion)
+  255  LOAD_CONST(('forward', 'np.ndarray', 'up_hint', 'np.ndarray', 'return', 'np.ndarray')); LOAD_CONST(<code object _look_rotation at 0x000001E8641216D0, file "server\retargeting.py", line 255>); MAKE_FUNCTION(annotations); STORE_NAME(_look_rotation)
+  281  NOP; NOP; LOAD_CONST(('landmarks', 'List[Tuple[float, float, float]]', 'return', 'np.ndarray')); LOAD_CONST(<code object _map_positions at 0x000001E8640E35C0, file "server\retargeting.py", line 281>); MAKE_FUNCTION(annotations); STORE_NAME(_map_positions)
+  282  NOP
+  283  NOP
+  333  LOAD_CONST(('bone_dir', 'np.ndarray', 'up_hint', 'np.ndarray', 'return', 'np.ndarray')); LOAD_CONST(<code object _joint_frame at 0x000001E864818810, file "server\retargeting.py", line 333>); MAKE_FUNCTION(annotations); STORE_NAME(_joint_frame)
+  346  LOAD_CONST(('parent_frame', 'np.ndarray', 'bone_dir', 'np.ndarray', 'return', 'np.ndarray')); LOAD_CONST(<code object _child_joint_frame at 0x000001E8647221F0, file "server\retargeting.py", line 346>); MAKE_FUNCTION(annotations); STORE_NAME(_child_joint_frame)
+  362  LOAD_CONST(('Right',)); NOP; NOP; LOAD_CONST(('positions', 'np.ndarray', 'handedness', 'str', 'return', 'List[Quaternion]')); LOAD_CONST(<code object _compute_orientations at 0x000001E86411D050, file "server\retargeting.py", line 362>); MAKE_FUNCTION(defaults, annotations); STORE_NAME(_compute_orientations)
+  363  NOP; NOP; NOP
+  364  NOP
+  421  LOAD_CONST((None, None, 'Right')); NOP; NOP; NOP; NOP; LOAD_CONST(('landmarks', 'List[Tuple[float, float, float]]', 'stage_offset', 'Optional[Tuple[float, float, float]]', 'axis_remap', 'Optional[np.ndarray]', 'handedness', 'str', 'return', 'List[JointPose]')); LOAD_CONST(<code object retarget at 0x000001E864062A60, file "server\retargeting.py", line 421>); MAKE_FUNCTION(defaults, annotations); STORE_NAME(retarget); RETURN_CONST(None)
+  422  NOP
+  423  NOP; NOP
+  424  NOP; NOP
+  425  NOP; NOP
+  426  NOP
+
+==============================================================================
+verbatim dis listing: server/retargeting.py:1-426 <module>
+==============================================================================
+  0           0 RESUME                   0
+
+  3           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Retarget MediaPipe 21 hand landmarks to OpenXR 26 hand joints.\n\nMediaPipe provides 21 position-only landmarks per hand (hand_world_landmarks,\nin meters). OpenXR requires 26 joints, each with a full 6DoF pose (position +\norientation quaternion) and a radius. This module bridges the two.\n\nKey operations:\n  1. Position mapping: 21 MediaPipe landmarks -> 26 OpenXR joint positions\n     (5 metacarpal joints are synthesized).\n  2. Coordinate system transform: MediaPipe -> OpenXR axis convention.\n  3. Orientation synthesis: Compute quaternion orientations from bone directions.\n  4. Fixed joint radii: Assign reasonable per-joint-type defaults.\n\nCoordinate systems:\n  MediaPipe hand_world_landmarks (right-handed):\n    X: increases toward camera-right (user\'s left in a typical selfie view)\n    Y: increases downward\n    Z: increases toward the camera (away from the screen)\n    Origin: hand geometric center\n\n  OpenXR stage space (right-handed):\n    X: increases to the right\n    Y: increases upward\n    Z: increases backward (toward the user)\n\n  Default transform: (-x, -y, z)\n    - X negated: mirrors so user\'s right = OpenXR +X\n    - Y negated: flips so up = OpenXR +Y\n    - Z preserved: both point "toward the user"\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 34           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 CACHE
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 36          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 CACHE
+             26 STORE_NAME               3 (math)
+
+ 37          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('dataclass',))
+             32 CACHE
+             34 IMPORT_FROM              5 (dataclass)
+             36 STORE_NAME               5 (dataclass)
+             38 POP_TOP
+
+ 38          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('List', 'Optional', 'Tuple'))
+             44 CACHE
+             46 IMPORT_FROM              7 (List)
+             48 STORE_NAME               7 (List)
+             50 IMPORT_FROM              8 (Optional)
+             52 STORE_NAME               8 (Optional)
+             54 IMPORT_FROM              9 (Tuple)
+             56 STORE_NAME               9 (Tuple)
+             58 POP_TOP
+
+ 40          60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               3 (None)
+             64 CACHE
+             66 STORE_NAME              11 (np)
+
+ 48          68 LOAD_NAME                5 (dataclass)
+
+ 49          70 PUSH_NULL
+             72 LOAD_BUILD_CLASS
+             74 LOAD_CONST               6 (<code object Quaternion at 0x000001E8647E2430, file "server\retargeting.py", line 48>)
+             76 MAKE_FUNCTION            0
+             78 LOAD_CONST               7 ('Quaternion')
+             80 CALL                     2
+
+ 48          88 CALL                     0
+
+ 49          96 STORE_NAME              12 (Quaternion)
+
+ 56          98 LOAD_NAME                5 (dataclass)
+
+ 57         100 PUSH_NULL
+            102 LOAD_BUILD_CLASS
+            104 LOAD_CONST               8 (<code object Vec3 at 0x000001E8647D93E0, file "server\retargeting.py", line 56>)
+            106 MAKE_FUNCTION            0
+            108 LOAD_CONST               9 ('Vec3')
+            110 CALL                     2
+
+ 56         118 CALL                     0
+
+ 57         126 STORE_NAME              13 (Vec3)
+
+ 63         128 LOAD_NAME                5 (dataclass)
+
+ 64         130 PUSH_NULL
+            132 LOAD_BUILD_CLASS
+            134 LOAD_CONST              10 (<code object JointPose at 0x000001E8647D9110, file "server\retargeting.py", line 63>)
+            136 MAKE_FUNCTION            0
+            138 LOAD_CONST              11 ('JointPose')
+            140 CALL                     2
+
+ 63         148 CALL                     0
+
+ 64         156 STORE_NAME              14 (JointPose)
+
+ 74         158 LOAD_CONST               1 (0)
+            160 STORE_NAME              15 (PALM)
+
+ 75         162 LOAD_CONST              12 (1)
+            164 STORE_NAME              16 (WRIST)
+
+ 76         166 LOAD_CONST              13 (2)
+            168 STORE_NAME              17 (THUMB_METACARPAL)
+
+ 77         170 LOAD_CONST              14 (3)
+            172 STORE_NAME              18 (THUMB_PROXIMAL)
+
+ 78         174 LOAD_CONST              15 (4)
+            176 STORE_NAME              19 (THUMB_DISTAL)
+
+ 79         178 LOAD_CONST              16 (5)
+            180 STORE_NAME              20 (THUMB_TIP)
+
+ 80         182 LOAD_CONST              17 (6)
+            184 STORE_NAME              21 (INDEX_METACARPAL)
+
+ 81         186 LOAD_CONST              18 (7)
+            188 STORE_NAME              22 (INDEX_PROXIMAL)
+
+ 82         190 LOAD_CONST              19 (8)
+            192 STORE_NAME              23 (INDEX_INTERMEDIATE)
+
+ 83         194 LOAD_CONST              20 (9)
+            196 STORE_NAME              24 (INDEX_DISTAL)
+
+ 84         198 LOAD_CONST              21 (10)
+            200 STORE_NAME              25 (INDEX_TIP)
+
+ 85         202 LOAD_CONST              22 (11)
+            204 STORE_NAME              26 (MIDDLE_METACARPAL)
+
+ 86         206 LOAD_CONST              23 (12)
+            208 STORE_NAME              27 (MIDDLE_PROXIMAL)
+
+ 87         210 LOAD_CONST              24 (13)
+            212 STORE_NAME              28 (MIDDLE_INTERMEDIATE)
+
+ 88         214 LOAD_CONST              25 (14)
+            216 STORE_NAME              29 (MIDDLE_DISTAL)
+
+ 89         218 LOAD_CONST              26 (15)
+            220 STORE_NAME              30 (MIDDLE_TIP)
+
+ 90         222 LOAD_CONST              27 (16)
+            224 STORE_NAME              31 (RING_METACARPAL)
+
+ 91         226 LOAD_CONST              28 (17)
+            228 STORE_NAME              32 (RING_PROXIMAL)
+
+ 92         230 LOAD_CONST              29 (18)
+            232 STORE_NAME              33 (RING_INTERMEDIATE)
+
+ 93         234 LOAD_CONST              30 (19)
+            236 STORE_NAME              34 (RING_DISTAL)
+
+ 94         238 LOAD_CONST              31 (20)
+            240 STORE_NAME              35 (RING_TIP)
+
+ 95         242 LOAD_CONST              32 (21)
+            244 STORE_NAME              36 (LITTLE_METACARPAL)
+
+ 96         246 LOAD_CONST              33 (22)
+            248 STORE_NAME              37 (LITTLE_PROXIMAL)
+
+ 97         250 LOAD_CONST              34 (23)
+            252 STORE_NAME              38 (LITTLE_INTERMEDIATE)
+
+ 98         254 LOAD_CONST              35 (24)
+            256 STORE_NAME              39 (LITTLE_DISTAL)
+
+ 99         258 LOAD_CONST              36 (25)
+            260 STORE_NAME              40 (LITTLE_TIP)
+
+101         262 LOAD_CONST              37 (26)
+            264 STORE_NAME              41 (XR_HAND_JOINT_COUNT)
+
+107         266 LOAD_CONST               1 (0)
+            268 STORE_NAME              42 (MP_WRIST)
+
+108         270 LOAD_CONST              12 (1)
+            272 STORE_NAME              43 (MP_THUMB_CMC)
+
+109         274 LOAD_CONST              13 (2)
+            276 STORE_NAME              44 (MP_THUMB_MCP)
+
+110         278 LOAD_CONST              14 (3)
+            280 STORE_NAME              45 (MP_THUMB_IP)
+
+111         282 LOAD_CONST              15 (4)
+            284 STORE_NAME              46 (MP_THUMB_TIP)
+
+112         286 LOAD_CONST              16 (5)
+            288 STORE_NAME              47 (MP_INDEX_MCP)
+
+113         290 LOAD_CONST              17 (6)
+            292 STORE_NAME              48 (MP_INDEX_PIP)
+
+114         294 LOAD_CONST              18 (7)
+            296 STORE_NAME              49 (MP_INDEX_DIP)
+
+115         298 LOAD_CONST              19 (8)
+            300 STORE_NAME              50 (MP_INDEX_TIP)
+
+116         302 LOAD_CONST              20 (9)
+            304 STORE_NAME              51 (MP_MIDDLE_MCP)
+
+117         306 LOAD_CONST              21 (10)
+            308 STORE_NAME              52 (MP_MIDDLE_PIP)
+
+118         310 LOAD_CONST              22 (11)
+            312 STORE_NAME              53 (MP_MIDDLE_DIP)
+
+119         314 LOAD_CONST              23 (12)
+            316 STORE_NAME              54 (MP_MIDDLE_TIP)
+
+120         318 LOAD_CONST              24 (13)
+            320 STORE_NAME              55 (MP_RING_MCP)
+
+121         322 LOAD_CONST              25 (14)
+            324 STORE_NAME              56 (MP_RING_PIP)
+
+122         326 LOAD_CONST              26 (15)
+            328 STORE_NAME              57 (MP_RING_DIP)
+
+123         330 LOAD_CONST              27 (16)
+            332 STORE_NAME              58 (MP_RING_TIP)
+
+124         334 LOAD_CONST              28 (17)
+            336 STORE_NAME              59 (MP_PINKY_MCP)
+
+125         338 LOAD_CONST              29 (18)
+            340 STORE_NAME              60 (MP_PINKY_PIP)
+
+126         342 LOAD_CONST              30 (19)
+            344 STORE_NAME              61 (MP_PINKY_DIP)
+
+127         346 LOAD_CONST              31 (20)
+            348 STORE_NAME              62 (MP_PINKY_TIP)
+
+140         350 PUSH_NULL
+            352 LOAD_NAME               11 (np)
+            354 LOAD_ATTR              126 (diag)
+            374 BUILD_LIST               0
+            376 LOAD_CONST              38 ((-1.0, -1.0, 1.0))
+            378 LIST_EXTEND              1
+            380 CALL                     1
+            388 STORE_NAME              64 (DEFAULT_AXIS_REMAP)
+            390 LOAD_CONST              39 ('np.ndarray')
+            392 LOAD_NAME               65 (__annotations__)
+            394 LOAD_CONST              40 ('DEFAULT_AXIS_REMAP')
+            396 STORE_SUBSCR
+
+146         400 BUILD_LIST               0
+            402 LOAD_CONST              41 ((0.017, 0.0222, 0.0201, 0.0127, 0.0101, 0.0091, 0.022, 0.0107, 0.0088, 0.0079, 0.0069, 0.022, 0.0116, 0.0083, 0.0079, 0.0069, 0.0198, 0.0103, 0.0079, 0.0075, 0.0065, 0.0187, 0.0088, 0.007, 0.0067, 0.0056))
+            404 LIST_EXTEND              1
+            406 STORE_NAME              66 (_JOINT_RADII)
+            408 LOAD_CONST              42 ('List[float]')
+            410 LOAD_NAME               65 (__annotations__)
+            412 LOAD_CONST              43 ('_JOINT_RADII')
+            414 STORE_SUBSCR
+
+182         418 LOAD_NAME               17 (THUMB_METACARPAL)
+            420 LOAD_NAME               18 (THUMB_PROXIMAL)
+            422 LOAD_NAME               19 (THUMB_DISTAL)
+            424 LOAD_NAME               20 (THUMB_TIP)
+            426 BUILD_LIST               4
+
+184         428 LOAD_NAME               21 (INDEX_METACARPAL)
+            430 LOAD_NAME               22 (INDEX_PROXIMAL)
+            432 LOAD_NAME               23 (INDEX_INTERMEDIATE)
+            434 LOAD_NAME               24 (INDEX_DISTAL)
+            436 LOAD_NAME               25 (INDEX_TIP)
+            438 BUILD_LIST               5
+
+187         440 LOAD_NAME               26 (MIDDLE_METACARPAL)
+
+188         442 LOAD_NAME               27 (MIDDLE_PROXIMAL)
+
+189         444 LOAD_NAME               28 (MIDDLE_INTERMEDIATE)
+
+190         446 LOAD_NAME               29 (MIDDLE_DISTAL)
+
+191         448 LOAD_NAME               30 (MIDDLE_TIP)
+
+186         450 BUILD_LIST               5
+
+194         452 LOAD_NAME               31 (RING_METACARPAL)
+            454 LOAD_NAME               32 (RING_PROXIMAL)
+            456 LOAD_NAME               33 (RING_INTERMEDIATE)
+            458 LOAD_NAME               34 (RING_DISTAL)
+            460 LOAD_NAME               35 (RING_TIP)
+            462 BUILD_LIST               5
+
+197         464 LOAD_NAME               36 (LITTLE_METACARPAL)
+
+198         466 LOAD_NAME               37 (LITTLE_PROXIMAL)
+
+199         468 LOAD_NAME               38 (LITTLE_INTERMEDIATE)
+
+200         470 LOAD_NAME               39 (LITTLE_DISTAL)
+
+201         472 LOAD_NAME               40 (LITTLE_TIP)
+
+196         474 BUILD_LIST               5
+
+180         476 BUILD_LIST               5
+            478 STORE_NAME              67 (_FINGER_CHAINS)
+            480 LOAD_CONST              44 ('List[List[int]]')
+            482 LOAD_NAME               65 (__annotations__)
+            484 LOAD_CONST              45 ('_FINGER_CHAINS')
+            486 STORE_SUBSCR
+
+210         490 LOAD_CONST              54 (('v', 'np.ndarray', 'return', 'np.ndarray'))
+            492 LOAD_CONST              46 (<code object _normalize at 0x000001E86474AAB0, file "server\retargeting.py", line 210>)
+            494 MAKE_FUNCTION            4 (annotations)
+            496 STORE_NAME              68 (_normalize)
+
+218         498 LOAD_CONST              55 (('m', 'np.ndarray', 'return', 'Quaternion'))
+            500 LOAD_CONST              47 (<code object _rotation_matrix_to_quaternion at 0x000001E864052D90, file "server\retargeting.py", line 218>)
+            502 MAKE_FUNCTION            4 (annotations)
+            504 STORE_NAME              69 (_rotation_matrix_to_quaternion)
+
+255         506 LOAD_CONST              56 (('forward', 'np.ndarray', 'up_hint', 'np.ndarray', 'return', 'np.ndarray'))
+            508 LOAD_CONST              48 (<code object _look_rotation at 0x000001E8641216D0, file "server\retargeting.py", line 255>)
+            510 MAKE_FUNCTION            4 (annotations)
+            512 STORE_NAME              70 (_look_rotation)
+
+281         514 NOP
+
+282         516 NOP
+
+281         518 NOP
+
+283         520 NOP
+
+281         522 LOAD_CONST              57 (('landmarks', 'List[Tuple[float, float, float]]', 'return', 'np.ndarray'))
+            524 LOAD_CONST              49 (<code object _map_positions at 0x000001E8640E35C0, file "server\retargeting.py", line 281>)
+            526 MAKE_FUNCTION            4 (annotations)
+            528 STORE_NAME              71 (_map_positions)
+
+333         530 LOAD_CONST              58 (('bone_dir', 'np.ndarray', 'up_hint', 'np.ndarray', 'return', 'np.ndarray'))
+            532 LOAD_CONST              50 (<code object _joint_frame at 0x000001E864818810, file "server\retargeting.py", line 333>)
+            534 MAKE_FUNCTION            4 (annotations)
+            536 STORE_NAME              72 (_joint_frame)
+
+346         538 LOAD_CONST              59 (('parent_frame', 'np.ndarray', 'bone_dir', 'np.ndarray', 'return', 'np.ndarray'))
+            540 LOAD_CONST              51 (<code object _child_joint_frame at 0x000001E8647221F0, file "server\retargeting.py", line 346>)
+            542 MAKE_FUNCTION            4 (annotations)
+            544 STORE_NAME              73 (_child_joint_frame)
+
+363         546 NOP
+
+362         548 LOAD_CONST              60 (('Right',))
+
+363         550 NOP
+
+362         552 NOP
+
+363         554 NOP
+
+362         556 NOP
+
+364         558 NOP
+
+362         560 LOAD_CONST              61 (('positions', 'np.ndarray', 'handedness', 'str', 'return', 'List[Quaternion]'))
+            562 LOAD_CONST              52 (<code object _compute_orientations at 0x000001E86411D050, file "server\retargeting.py", line 362>)
+            564 MAKE_FUNCTION            5 (defaults, annotations)
+            566 STORE_NAME              74 (_compute_orientations)
+
+423         568 NOP
+
+424         570 NOP
+
+425         572 NOP
+
+421         574 LOAD_CONST              62 ((None, None, 'Right'))
+
+422         576 NOP
+
+421         578 NOP
+
+423         580 NOP
+
+421         582 NOP
+
+424         584 NOP
+
+421         586 NOP
+
+425         588 NOP
+
+421         590 NOP
+
+426         592 NOP
+
+421         594 LOAD_CONST              63 (('landmarks', 'List[Tuple[float, float, float]]', 'stage_offset', 'Optional[Tuple[float, float, float]]', 'axis_remap', 'Optional[np.ndarray]', 'handedness', 'str', 'return', 'List[JointPose]'))
+            596 LOAD_CONST              53 (<code object retarget at 0x000001E864062A60, file "server\retargeting.py", line 421>)
+            598 MAKE_FUNCTION            5 (defaults, annotations)
+            600 STORE_NAME              75 (retarget)
+            602 RETURN_CONST             3 (None)

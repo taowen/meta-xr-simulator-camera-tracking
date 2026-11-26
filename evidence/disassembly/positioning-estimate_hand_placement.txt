@@ -1,0 +1,228 @@
+# server/positioning.py:331-385  estimate_hand_placement
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  357  LOAD_FAST(config); POP_JUMP_IF_NOT_NONE(to 18)
+  358  LOAD_GLOBAL(DEFAULT_WORKSPACE); STORE_FAST(config)
+  360  LOAD_FAST(world_landmarks); EXTENDED_ARG; POP_JUMP_IF_FALSE(to 652)
+  361  LOAD_FAST(image_size); POP_JUMP_IF_NONE(to 138); LOAD_FAST(image_size); LOAD_CONST(0); BINARY_SUBSCR; LOAD_CONST(0); COMPARE_OP(>); POP_JUMP_IF_FALSE(to 138); LOAD_FAST(image_size); LOAD_CONST(1); BINARY_SUBSCR; LOAD_CONST(0); COMPARE_OP(>); POP_JUMP_IF_FALSE(to 138)
+  362  LOAD_FAST(image_size); LOAD_CONST(1); BINARY_SUBSCR; LOAD_FAST(image_size); LOAD_CONST(0); BINARY_SUBSCR; BINARY_OP(/); STORE_FAST(aspect)
+  363  LOAD_FAST(aspect); LOAD_FAST(config); LOAD_ATTR(image_aspect); COMPARE_OP(!=); POP_JUMP_IF_FALSE(to 138)
+  364  LOAD_GLOBAL(NULL + replace); LOAD_FAST(config); LOAD_FAST(aspect); KW_NAMES(('image_aspect',)); CALL; STORE_FAST(config)
+  365  LOAD_GLOBAL(NULL + solve_camera_pose); LOAD_FAST(world_landmarks); LOAD_FAST(image_landmarks); LOAD_FAST(config); CALL; STORE_FAST(pose)
+  366  LOAD_FAST(pose); POP_JUMP_IF_NONE(to 594)
+  367  LOAD_FAST(pose); UNPACK_SEQUENCE; STORE_FAST(rotation); STORE_FAST(translation)
+  368  LOAD_GLOBAL(NULL + np); LOAD_ATTR(asarray); LOAD_FAST(world_landmarks); LOAD_GLOBAL(np); LOAD_ATTR(float64); KW_NAMES(('dtype',)); CALL; LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(None); LOAD_CONST(3); BUILD_SLICE; BUILD_TUPLE; BINARY_SUBSCR; STORE_FAST(points)
+  369  LOAD_FAST(rotation); LOAD_FAST(points); LOAD_GLOBAL(_MP_WRIST); BINARY_SUBSCR; BINARY_OP(@); LOAD_FAST(translation); BINARY_OP(+); STORE_FAST(wrist)
+  372  LOAD_FAST(config); LOAD_ATTR(camera_position); UNPACK_SEQUENCE; STORE_FAST(cx); STORE_FAST(cy); STORE_FAST(cz)
+  373  LOAD_FAST(cx); LOAD_GLOBAL(NULL + float); LOAD_FAST(wrist); LOAD_CONST(0); BINARY_SUBSCR; CALL; BINARY_OP(-); LOAD_FAST(cy); LOAD_GLOBAL(NULL + float); LOAD_FAST(wrist); LOAD_CONST(1); BINARY_SUBSCR; CALL; BINARY_OP(-); LOAD_FAST(cz); LOAD_GLOBAL(NULL + float); LOAD_FAST(wrist); LOAD_CONST(2); BINARY_SUBSCR; CALL; BINARY_OP(+); BUILD_TUPLE; STORE_FAST(stage)
+  374  LOAD_FAST(points); LOAD_FAST(rotation); LOAD_ATTR(T); BINARY_OP(@); STORE_FAST(rotated)
+  375  LOAD_GLOBAL(NULL + apply_reach_gain); LOAD_FAST(stage); LOAD_FAST(config); CALL; LOAD_FAST_AND_CLEAR(x); LOAD_FAST_AND_CLEAR(y); LOAD_FAST_AND_CLEAR(z); SWAP; BUILD_LIST; SWAP; SWAP; STORE_FAST(z); STORE_FAST(y); STORE_FAST(x); BUILD_TUPLE; RETURN_VALUE; SWAP; STORE_FAST(z); STORE_FAST(y); STORE_FAST(x); RERAISE
+  376  LOAD_FAST(rotated); GET_ITER; FOR_ITER(to 580); UNPACK_SEQUENCE; STORE_FAST(x); STORE_FAST(y); STORE_FAST(z); LOAD_GLOBAL(NULL + float); LOAD_FAST(x); CALL; LOAD_GLOBAL(NULL + float); LOAD_FAST(y); CALL; LOAD_GLOBAL(NULL + float); LOAD_FAST(z); CALL; BUILD_TUPLE; LIST_APPEND; JUMP_BACKWARD(to 500); END_FOR
+  378  LOAD_GLOBAL(_fallback_logged); POP_JUMP_IF_TRUE(to 652)
+  379  LOAD_CONST(True); STORE_GLOBAL(_fallback_logged)
+  380  LOAD_GLOBAL(logger); LOAD_ATTR(NULL|self + warning); CALL; POP_TOP
+  381  LOAD_CONST('Pinhole placement rejected a hand; using the palm-width model (logged once)')
+  385  LOAD_GLOBAL(NULL + estimate_stage_position); LOAD_FAST(image_landmarks); LOAD_FAST(config); CALL; LOAD_CONST(None); BUILD_TUPLE; RETURN_VALUE; SWAP; POP_TOP
+
+==============================================================================
+verbatim dis listing: server/positioning.py:331-385 estimate_hand_placement
+==============================================================================
+331           0 RESUME                   0
+
+357           2 LOAD_FAST                1 (config)
+              4 POP_JUMP_IF_NOT_NONE     6 (to 18)
+
+358           6 LOAD_GLOBAL              0 (DEFAULT_WORKSPACE)
+             16 STORE_FAST               1 (config)
+
+360     >>   18 LOAD_FAST                2 (world_landmarks)
+             20 EXTENDED_ARG             1
+             22 POP_JUMP_IF_FALSE      314 (to 652)
+
+361          24 LOAD_FAST                3 (image_size)
+             26 POP_JUMP_IF_NONE        55 (to 138)
+             28 LOAD_FAST                3 (image_size)
+             30 LOAD_CONST               2 (0)
+             32 BINARY_SUBSCR
+             36 LOAD_CONST               2 (0)
+             38 COMPARE_OP              68 (>)
+             42 POP_JUMP_IF_FALSE       47 (to 138)
+             44 LOAD_FAST                3 (image_size)
+             46 LOAD_CONST               3 (1)
+             48 BINARY_SUBSCR
+             52 LOAD_CONST               2 (0)
+             54 COMPARE_OP              68 (>)
+             58 POP_JUMP_IF_FALSE       39 (to 138)
+
+362          60 LOAD_FAST                3 (image_size)
+             62 LOAD_CONST               3 (1)
+             64 BINARY_SUBSCR
+             68 LOAD_FAST                3 (image_size)
+             70 LOAD_CONST               2 (0)
+             72 BINARY_SUBSCR
+             76 BINARY_OP               11 (/)
+             80 STORE_FAST               4 (aspect)
+
+363          82 LOAD_FAST                4 (aspect)
+             84 LOAD_FAST                1 (config)
+             86 LOAD_ATTR                2 (image_aspect)
+            106 COMPARE_OP              55 (!=)
+            110 POP_JUMP_IF_FALSE       13 (to 138)
+
+364         112 LOAD_GLOBAL              5 (NULL + replace)
+            122 LOAD_FAST                1 (config)
+            124 LOAD_FAST                4 (aspect)
+            126 KW_NAMES                 4 (('image_aspect',))
+            128 CALL                     2
+            136 STORE_FAST               1 (config)
+
+365     >>  138 LOAD_GLOBAL              7 (NULL + solve_camera_pose)
+            148 LOAD_FAST                2 (world_landmarks)
+            150 LOAD_FAST                0 (image_landmarks)
+            152 LOAD_FAST                1 (config)
+            154 CALL                     3
+            162 STORE_FAST               5 (pose)
+
+366         164 LOAD_FAST                5 (pose)
+            166 POP_JUMP_IF_NONE       213 (to 594)
+
+367         168 LOAD_FAST                5 (pose)
+            170 UNPACK_SEQUENCE          2
+            174 STORE_FAST               6 (rotation)
+            176 STORE_FAST               7 (translation)
+
+368         178 LOAD_GLOBAL              9 (NULL + np)
+            188 LOAD_ATTR               10 (asarray)
+            208 LOAD_FAST                2 (world_landmarks)
+            210 LOAD_GLOBAL              8 (np)
+            220 LOAD_ATTR               12 (float64)
+            240 KW_NAMES                 5 (('dtype',))
+            242 CALL                     2
+            250 LOAD_CONST               1 (None)
+            252 LOAD_CONST               1 (None)
+            254 BUILD_SLICE              2
+            256 LOAD_CONST               1 (None)
+            258 LOAD_CONST               6 (3)
+            260 BUILD_SLICE              2
+            262 BUILD_TUPLE              2
+            264 BINARY_SUBSCR
+            268 STORE_FAST               8 (points)
+
+369         270 LOAD_FAST                6 (rotation)
+            272 LOAD_FAST                8 (points)
+            274 LOAD_GLOBAL             14 (_MP_WRIST)
+            284 BINARY_SUBSCR
+            288 BINARY_OP                4 (@)
+            292 LOAD_FAST                7 (translation)
+            294 BINARY_OP                0 (+)
+            298 STORE_FAST               9 (wrist)
+
+372         300 LOAD_FAST                1 (config)
+            302 LOAD_ATTR               16 (camera_position)
+            322 UNPACK_SEQUENCE          3
+            326 STORE_FAST              10 (cx)
+            328 STORE_FAST              11 (cy)
+            330 STORE_FAST              12 (cz)
+
+373         332 LOAD_FAST               10 (cx)
+            334 LOAD_GLOBAL             19 (NULL + float)
+            344 LOAD_FAST                9 (wrist)
+            346 LOAD_CONST               2 (0)
+            348 BINARY_SUBSCR
+            352 CALL                     1
+            360 BINARY_OP               10 (-)
+            364 LOAD_FAST               11 (cy)
+            366 LOAD_GLOBAL             19 (NULL + float)
+            376 LOAD_FAST                9 (wrist)
+            378 LOAD_CONST               3 (1)
+            380 BINARY_SUBSCR
+            384 CALL                     1
+            392 BINARY_OP               10 (-)
+            396 LOAD_FAST               12 (cz)
+            398 LOAD_GLOBAL             19 (NULL + float)
+            408 LOAD_FAST                9 (wrist)
+            410 LOAD_CONST               7 (2)
+            412 BINARY_SUBSCR
+            416 CALL                     1
+            424 BINARY_OP                0 (+)
+            428 BUILD_TUPLE              3
+            430 STORE_FAST              13 (stage)
+
+374         432 LOAD_FAST                8 (points)
+            434 LOAD_FAST                6 (rotation)
+            436 LOAD_ATTR               20 (T)
+            456 BINARY_OP                4 (@)
+            460 STORE_FAST              14 (rotated)
+
+375         462 LOAD_GLOBAL             23 (NULL + apply_reach_gain)
+            472 LOAD_FAST               13 (stage)
+            474 LOAD_FAST                1 (config)
+            476 CALL                     2
+
+376         484 LOAD_FAST               14 (rotated)
+            486 GET_ITER
+
+375         488 LOAD_FAST_AND_CLEAR     15 (x)
+            490 LOAD_FAST_AND_CLEAR     16 (y)
+            492 LOAD_FAST_AND_CLEAR     17 (z)
+            494 SWAP                     4
+            496 BUILD_LIST               0
+            498 SWAP                     2
+
+376     >>  500 FOR_ITER                38 (to 580)
+            504 UNPACK_SEQUENCE          3
+            508 STORE_FAST              15 (x)
+            510 STORE_FAST              16 (y)
+            512 STORE_FAST              17 (z)
+            514 LOAD_GLOBAL             19 (NULL + float)
+            524 LOAD_FAST               15 (x)
+            526 CALL                     1
+            534 LOAD_GLOBAL             19 (NULL + float)
+            544 LOAD_FAST               16 (y)
+            546 CALL                     1
+            554 LOAD_GLOBAL             19 (NULL + float)
+            564 LOAD_FAST               17 (z)
+            566 CALL                     1
+            574 BUILD_TUPLE              3
+            576 LIST_APPEND              2
+            578 JUMP_BACKWARD           40 (to 500)
+        >>  580 END_FOR
+
+375         582 SWAP                     4
+            584 STORE_FAST              17 (z)
+            586 STORE_FAST              16 (y)
+            588 STORE_FAST              15 (x)
+            590 BUILD_TUPLE              2
+            592 RETURN_VALUE
+
+378     >>  594 LOAD_GLOBAL             24 (_fallback_logged)
+            604 POP_JUMP_IF_TRUE        23 (to 652)
+
+379         606 LOAD_CONST               8 (True)
+            608 STORE_GLOBAL            12 (_fallback_logged)
+
+380         610 LOAD_GLOBAL             26 (logger)
+            620 LOAD_ATTR               29 (NULL|self + warning)
+
+381         640 LOAD_CONST               9 ('Pinhole placement rejected a hand; using the palm-width model (logged once)')
+
+380         642 CALL                     1
+            650 POP_TOP
+
+385     >>  652 LOAD_GLOBAL             31 (NULL + estimate_stage_position)
+            662 LOAD_FAST                0 (image_landmarks)
+            664 LOAD_FAST                1 (config)
+            666 CALL                     2
+            674 LOAD_CONST               1 (None)
+            676 BUILD_TUPLE              2
+            678 RETURN_VALUE
+        >>  680 SWAP                     2
+            682 POP_TOP
+
+375         684 SWAP                     4
+            686 STORE_FAST              17 (z)
+            688 STORE_FAST              16 (y)
+            690 STORE_FAST              15 (x)
+            692 RERAISE                  0
+ExceptionTable:
+  496 to 580 -> 680 [5]

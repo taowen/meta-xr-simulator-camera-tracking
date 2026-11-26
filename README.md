@@ -129,6 +129,15 @@ py -3.12 .\inspect_camera_tracking.py --verify-public-models
 
 将安装目录作为第一个参数可检查其他位置的同一版本。默认检查仅使用本机文件。`--verify-public-models` 额外下载 Google 的公开模型到内存进行哈希比对。
 
+除交互式检查外，仓库把下表的每一行拆成了可执行断言。[claims/claims.json](claims/claims.json) 为每条结论记录「哪个文件的哪个函数、哪几行、必须出现哪条指令」，[tools/verify.py](tools/verify.py) 一次跑完并按需比对模型哈希，输出 `19/19 claims verified`；命中的指令原文快照在 [evidence/disassembly/](evidence/disassembly/)，逐条对照见 [article/bytecode-notes.md](article/bytecode-notes.md)。
+
+```powershell
+py -3.12 .\tools\extract.py --install "C:\Program Files\MetaXRSimulator\v207.1" --out build
+py -3.12 .\tools\verify.py --models "C:\Program Files\MetaXRSimulator\v207.1\webcam_tracking_server\_internal"
+```
+
+两套脚本都只用标准库：`marshal` 读代码对象，`dis` 反汇编，全程不导入包内模块。`evidence/` 是快照、`claims/` 是断言，都由 [tools/snapshot.py](tools/snapshot.py) 从本机副本重新生成；`build/` 已忽略。行号与指令只对本次样本成立，换版本重跑，失败清单就是差异清单。
+
 | 结论 | 安装包内的函数 |
 |---|---|
 | MediaPipe 手部和头部模型 | `mediapipe_detector.py:167`、`head_pose_detector.py:268` |
@@ -139,3 +148,5 @@ py -3.12 .\inspect_camera_tracking.py --verify-public-models
 | 头部平移为零 | `hand_tracking_service.py:184` |
 
 本次检查的 `webcam_tracking_server.exe` SHA-256 为 `d59aa21863beeaac5e2a70277aa5f40347dced6ad2625dab3fc63a55e529530f`。原始行号由打包字节码记录。伪代码省略了线程、时序和异常处理，适用于这个 Windows 样本。
+
+仓库不含 Meta 的二进制与模型文件，也不含反编译后的完整源码：[evidence/](evidence/) 只保留支撑上述结论的函数级字节码节选，[article/](article/) 里的代码是按字节码转写的等价形态。来源与授权说明见 [NOTICE.md](NOTICE.md)。

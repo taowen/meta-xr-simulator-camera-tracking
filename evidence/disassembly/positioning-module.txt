@@ -1,0 +1,299 @@
+# server/positioning.py:1-336  <module>
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+    3  SETUP_ANNOTATIONS; LOAD_CONST('Map image-space hand landmarks to stage-space wrist positions.\n\nConverts MediaPipe image-space hand landmarks (normalized to the camera frame)\nto a 3D position in OpenXR stage space, so hands have a meaningful placement in\nthe virtual scene rather than being pinned at the origin.\n\nLateral placement (X/Y) comes from the wrist\'s position in the camera image.\nDepth (Z) is estimated from the hand\'s *apparent size*: a hand closer to the\ncamera spans more of the frame. We deliberately do NOT use the wrist landmark\'s\nimage-space ``z`` for depth — in MediaPipe ``hand_landmarks`` the wrist (index 0)\nis the depth origin, so its ``z`` is always ~0 and never reflects forward/back\nmotion. Apparent size is the usable monocular depth cue (TDD §11 / Future Work:\n"better depth estimation from hand bbox area").\n\n    image (0,0) top-left  ->  stage (+x, +y)  top-right (mirrored)\n    image (1,1) bot-right ->  stage (-x, -y)  bot-left  (mirrored)\n    image center          ->  stage_center\n    larger apparent hand  ->  more negative stage z (forward, toward the scene)\n    smaller apparent hand ->  more positive stage z (back, toward the user)\n\nX is mirrored so the user\'s right hand maps to stage +X (user\'s right).\nY is flipped so raising a hand maps to stage +Y (up).\n\nWhen MediaPipe\'s metric world landmarks are available, ``estimate_hand_placement``\nreplaces both heuristics above with a pinhole camera model: the hand\'s metric\n3D shape is placed where it projects onto the observed image landmarks, which\nyields its camera-space position (lateral and depth) in meters. Depth maps 1:1\ninto stage space; sideways and vertical motion is amplified by\n``WorkspaceConfig.reach_gain`` so the hand can sweep the whole view. The\npalm-width model above remains the fallback.\n'); STORE_NAME(__doc__)
+   35  LOAD_CONST(0); LOAD_CONST(('annotations',)); IMPORT_FROM(annotations); STORE_NAME(annotations); POP_TOP
+   37  LOAD_CONST(0); LOAD_CONST(None); STORE_NAME(logging)
+   38  LOAD_CONST(0); LOAD_CONST(None); STORE_NAME(math)
+   39  LOAD_CONST(0); LOAD_CONST(('dataclass', 'replace')); IMPORT_FROM(dataclass); STORE_NAME(dataclass); IMPORT_FROM(replace); STORE_NAME(replace); POP_TOP
+   40  LOAD_CONST(0); LOAD_CONST(('List', 'Optional', 'Sequence', 'Tuple')); IMPORT_FROM(List); STORE_NAME(List); IMPORT_FROM(Optional); STORE_NAME(Optional); IMPORT_FROM(Sequence); STORE_NAME(Sequence); IMPORT_FROM(Tuple); STORE_NAME(Tuple); POP_TOP
+   42  LOAD_CONST(0); LOAD_CONST(None); STORE_NAME(np)
+   44  PUSH_NULL; LOAD_NAME(logging); LOAD_ATTR(getLogger); LOAD_NAME(__name__); CALL; STORE_NAME(logger); LOAD_CONST('logging.Logger'); LOAD_NAME(__annotations__); LOAD_CONST('logger'); STORE_SUBSCR
+   47  LOAD_NAME(dataclass); CALL
+   48  PUSH_NULL; LOAD_BUILD_CLASS; LOAD_CONST(<code object WorkspaceConfig at 0x000001E8647DD630, file "server\positioning.py", line 47>); MAKE_FUNCTION; LOAD_CONST('WorkspaceConfig'); CALL; STORE_NAME(WorkspaceConfig)
+  104  PUSH_NULL; LOAD_NAME(WorkspaceConfig); CALL; STORE_NAME(DEFAULT_WORKSPACE)
+  112  LOAD_CONST(0.08); STORE_NAME(_MIN_CAMERA_DEPTH_M)
+  113  LOAD_CONST(3.0); STORE_NAME(_MAX_CAMERA_DEPTH_M)
+  118  LOAD_CONST(0.25); STORE_NAME(_MAX_NEAR_REPROJECTION_ERROR)
+  121  LOAD_CONST(0.02); STORE_NAME(_MIN_POINT_DEPTH_M)
+  124  LOAD_CONST(2); STORE_NAME(_RAY_ITERATIONS)
+  126  LOAD_CONST(False); STORE_GLOBAL(_fallback_logged)
+  130  LOAD_CONST(0); STORE_NAME(_MP_WRIST)
+  131  LOAD_CONST(5); STORE_NAME(_MP_INDEX_MCP)
+  132  LOAD_CONST(17); STORE_NAME(_MP_PINKY_MCP)
+  135  LOAD_CONST(('image_landmarks', 'List[Tuple[float, float, float]]', 'return', 'float')); LOAD_CONST(<code object _palm_width at 0x000001E8647DD790, file "server\positioning.py", line 135>); MAKE_FUNCTION(annotations); STORE_NAME(_palm_width)
+  148  NOP; NOP; NOP; LOAD_CONST(('image_landmarks', 'List[Tuple[float, float, float]]', 'config', 'WorkspaceConfig', 'return', 'float')); LOAD_CONST(<code object _estimate_depth_offset at 0x000001E864736F10, file "server\positioning.py", line 148>); MAKE_FUNCTION(annotations); STORE_NAME(_estimate_depth_offset)
+  149  NOP
+  150  NOP
+  151  NOP
+  170  LOAD_CONST((None,)); NOP; NOP; LOAD_CONST(('image_landmarks', 'List[Tuple[float, float, float]]', 'config', 'Optional[WorkspaceConfig]', 'return', 'Tuple[float, float, float]')); LOAD_CONST(<code object estimate_stage_position at 0x000001E8642824F0, file "server\positioning.py", line 170>); MAKE_FUNCTION(defaults, annotations); STORE_NAME(estimate_stage_position)
+  171  NOP
+  172  NOP; NOP
+  173  NOP
+  206  NOP; NOP; NOP; NOP; LOAD_CONST(('points', 'np.ndarray', 'image_landmarks', 'Sequence[Tuple[float, float, float]]', 'config', 'WorkspaceConfig', 'return', 'Optional[np.ndarray]')); LOAD_CONST(<code object _solve_translation at 0x000001E8640E4150, file "server\positioning.py", line 206>); MAKE_FUNCTION(annotations); STORE_NAME(_solve_translation)
+  207  NOP
+  208  NOP
+  209  NOP
+  210  NOP
+  265  LOAD_CONST(('ray', 'np.ndarray', 'return', 'np.ndarray')); LOAD_CONST(<code object _rotation_onto_ray at 0x000001E8640E2E80, file "server\positioning.py", line 265>); MAKE_FUNCTION(annotations); STORE_NAME(_rotation_onto_ray)
+  283  NOP; NOP; NOP; NOP; LOAD_CONST(('world_landmarks', 'Sequence[Tuple[float, float, float]]', 'image_landmarks', 'Sequence[Tuple[float, float, float]]', 'config', 'WorkspaceConfig', 'return', 'Optional[Tuple[np.ndarray, np.ndarray]]')); LOAD_CONST(<code object solve_camera_pose at 0x000001E8641216D0, file "server\positioning.py", line 283>); MAKE_FUNCTION(annotations); STORE_NAME(solve_camera_pose)
+  284  NOP
+  285  NOP
+  286  NOP
+  287  NOP
+  319  NOP; NOP; NOP; LOAD_CONST(('stage_point', 'Tuple[float, float, float]', 'config', 'WorkspaceConfig', 'return', 'Tuple[float, float, float]')); LOAD_CONST(<code object apply_reach_gain at 0x000001E86474A970, file "server\positioning.py", line 319>); MAKE_FUNCTION(annotations); STORE_NAME(apply_reach_gain)
+  320  NOP
+  321  NOP
+  322  NOP
+  331  LOAD_CONST((None, None, None)); NOP; NOP; NOP; NOP; LOAD_CONST(('image_landmarks', 'List[Tuple[float, float, float]]', 'config', 'Optional[WorkspaceConfig]', 'world_landmarks', 'Optional[Sequence[Tuple[float, float, float]]]', 'image_size', 'Optional[Tuple[int, int]]', 'return', 'Tuple[Tuple[float, float, float], Optional[List[Tuple[float, float, float]]]]')); LOAD_CONST(<code object estimate_hand_placement at 0x000001E864053070, file "server\positioning.py", line 331>); MAKE_FUNCTION(defaults, annotations); STORE_NAME(estimate_hand_placement); RETURN_CONST(None)
+  332  NOP
+  333  NOP; NOP
+  334  NOP; NOP
+  335  NOP; NOP
+  336  NOP
+
+==============================================================================
+verbatim dis listing: server/positioning.py:1-336 <module>
+==============================================================================
+  0           0 RESUME                   0
+
+  3           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Map image-space hand landmarks to stage-space wrist positions.\n\nConverts MediaPipe image-space hand landmarks (normalized to the camera frame)\nto a 3D position in OpenXR stage space, so hands have a meaningful placement in\nthe virtual scene rather than being pinned at the origin.\n\nLateral placement (X/Y) comes from the wrist\'s position in the camera image.\nDepth (Z) is estimated from the hand\'s *apparent size*: a hand closer to the\ncamera spans more of the frame. We deliberately do NOT use the wrist landmark\'s\nimage-space ``z`` for depth — in MediaPipe ``hand_landmarks`` the wrist (index 0)\nis the depth origin, so its ``z`` is always ~0 and never reflects forward/back\nmotion. Apparent size is the usable monocular depth cue (TDD §11 / Future Work:\n"better depth estimation from hand bbox area").\n\n    image (0,0) top-left  ->  stage (+x, +y)  top-right (mirrored)\n    image (1,1) bot-right ->  stage (-x, -y)  bot-left  (mirrored)\n    image center          ->  stage_center\n    larger apparent hand  ->  more negative stage z (forward, toward the scene)\n    smaller apparent hand ->  more positive stage z (back, toward the user)\n\nX is mirrored so the user\'s right hand maps to stage +X (user\'s right).\nY is flipped so raising a hand maps to stage +Y (up).\n\nWhen MediaPipe\'s metric world landmarks are available, ``estimate_hand_placement``\nreplaces both heuristics above with a pinhole camera model: the hand\'s metric\n3D shape is placed where it projects onto the observed image landmarks, which\nyields its camera-space position (lateral and depth) in meters. Depth maps 1:1\ninto stage space; sideways and vertical motion is amplified by\n``WorkspaceConfig.reach_gain`` so the hand can sweep the whole view. The\npalm-width model above remains the fallback.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 35           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 CACHE
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 37          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 CACHE
+             26 STORE_NAME               3 (logging)
+
+ 38          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 CACHE
+             34 STORE_NAME               4 (math)
+
+ 39          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               4 (('dataclass', 'replace'))
+             40 CACHE
+             42 IMPORT_FROM              6 (dataclass)
+             44 STORE_NAME               6 (dataclass)
+             46 IMPORT_FROM              7 (replace)
+             48 STORE_NAME               7 (replace)
+             50 POP_TOP
+
+ 40          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               5 (('List', 'Optional', 'Sequence', 'Tuple'))
+             56 CACHE
+             58 IMPORT_FROM              9 (List)
+             60 STORE_NAME               9 (List)
+             62 IMPORT_FROM             10 (Optional)
+             64 STORE_NAME              10 (Optional)
+             66 IMPORT_FROM             11 (Sequence)
+             68 STORE_NAME              11 (Sequence)
+             70 IMPORT_FROM             12 (Tuple)
+             72 STORE_NAME              12 (Tuple)
+             74 POP_TOP
+
+ 42          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               3 (None)
+             80 CACHE
+             82 STORE_NAME              14 (np)
+
+ 44          84 PUSH_NULL
+             86 LOAD_NAME                3 (logging)
+             88 LOAD_ATTR               30 (getLogger)
+            108 LOAD_NAME               16 (__name__)
+            110 CALL                     1
+            118 STORE_NAME              17 (logger)
+            120 LOAD_CONST               6 ('logging.Logger')
+            122 LOAD_NAME               18 (__annotations__)
+            124 LOAD_CONST               7 ('logger')
+            126 STORE_SUBSCR
+
+ 47         130 LOAD_NAME                6 (dataclass)
+
+ 48         132 PUSH_NULL
+            134 LOAD_BUILD_CLASS
+            136 LOAD_CONST               8 (<code object WorkspaceConfig at 0x000001E8647DD630, file "server\positioning.py", line 47>)
+            138 MAKE_FUNCTION            0
+            140 LOAD_CONST               9 ('WorkspaceConfig')
+            142 CALL                     2
+
+ 47         150 CALL                     0
+
+ 48         158 STORE_NAME              19 (WorkspaceConfig)
+
+104         160 PUSH_NULL
+            162 LOAD_NAME               19 (WorkspaceConfig)
+            164 CALL                     0
+            172 STORE_NAME              20 (DEFAULT_WORKSPACE)
+
+112         174 LOAD_CONST              10 (0.08)
+            176 STORE_NAME              21 (_MIN_CAMERA_DEPTH_M)
+
+113         178 LOAD_CONST              11 (3.0)
+            180 STORE_NAME              22 (_MAX_CAMERA_DEPTH_M)
+
+118         182 LOAD_CONST              12 (0.25)
+            184 STORE_NAME              23 (_MAX_NEAR_REPROJECTION_ERROR)
+
+121         186 LOAD_CONST              13 (0.02)
+            188 STORE_NAME              24 (_MIN_POINT_DEPTH_M)
+
+124         190 LOAD_CONST              14 (2)
+            192 STORE_NAME              25 (_RAY_ITERATIONS)
+
+126         194 LOAD_CONST              15 (False)
+            196 STORE_GLOBAL            26 (_fallback_logged)
+
+130         198 LOAD_CONST               1 (0)
+            200 STORE_NAME              27 (_MP_WRIST)
+
+131         202 LOAD_CONST              16 (5)
+            204 STORE_NAME              28 (_MP_INDEX_MCP)
+
+132         206 LOAD_CONST              17 (17)
+            208 STORE_NAME              29 (_MP_PINKY_MCP)
+
+135         210 LOAD_CONST              26 (('image_landmarks', 'List[Tuple[float, float, float]]', 'return', 'float'))
+            212 LOAD_CONST              18 (<code object _palm_width at 0x000001E8647DD790, file "server\positioning.py", line 135>)
+            214 MAKE_FUNCTION            4 (annotations)
+            216 STORE_NAME              30 (_palm_width)
+
+148         218 NOP
+
+149         220 NOP
+
+148         222 NOP
+
+150         224 NOP
+
+148         226 NOP
+
+151         228 NOP
+
+148         230 LOAD_CONST              27 (('image_landmarks', 'List[Tuple[float, float, float]]', 'config', 'WorkspaceConfig', 'return', 'float'))
+            232 LOAD_CONST              19 (<code object _estimate_depth_offset at 0x000001E864736F10, file "server\positioning.py", line 148>)
+            234 MAKE_FUNCTION            4 (annotations)
+            236 STORE_NAME              31 (_estimate_depth_offset)
+
+172         238 NOP
+
+170         240 LOAD_CONST              28 ((None,))
+
+171         242 NOP
+
+170         244 NOP
+
+172         246 NOP
+
+170         248 NOP
+
+173         250 NOP
+
+170         252 LOAD_CONST              29 (('image_landmarks', 'List[Tuple[float, float, float]]', 'config', 'Optional[WorkspaceConfig]', 'return', 'Tuple[float, float, float]'))
+            254 LOAD_CONST              20 (<code object estimate_stage_position at 0x000001E8642824F0, file "server\positioning.py", line 170>)
+            256 MAKE_FUNCTION            5 (defaults, annotations)
+            258 STORE_NAME              32 (estimate_stage_position)
+
+206         260 NOP
+
+207         262 NOP
+
+206         264 NOP
+
+208         266 NOP
+
+206         268 NOP
+
+209         270 NOP
+
+206         272 NOP
+
+210         274 NOP
+
+206         276 LOAD_CONST              30 (('points', 'np.ndarray', 'image_landmarks', 'Sequence[Tuple[float, float, float]]', 'config', 'WorkspaceConfig', 'return', 'Optional[np.ndarray]'))
+            278 LOAD_CONST              21 (<code object _solve_translation at 0x000001E8640E4150, file "server\positioning.py", line 206>)
+            280 MAKE_FUNCTION            4 (annotations)
+            282 STORE_NAME              33 (_solve_translation)
+
+265         284 LOAD_CONST              31 (('ray', 'np.ndarray', 'return', 'np.ndarray'))
+            286 LOAD_CONST              22 (<code object _rotation_onto_ray at 0x000001E8640E2E80, file "server\positioning.py", line 265>)
+            288 MAKE_FUNCTION            4 (annotations)
+            290 STORE_NAME              34 (_rotation_onto_ray)
+
+283         292 NOP
+
+284         294 NOP
+
+283         296 NOP
+
+285         298 NOP
+
+283         300 NOP
+
+286         302 NOP
+
+283         304 NOP
+
+287         306 NOP
+
+283         308 LOAD_CONST              32 (('world_landmarks', 'Sequence[Tuple[float, float, float]]', 'image_landmarks', 'Sequence[Tuple[float, float, float]]', 'config', 'WorkspaceConfig', 'return', 'Optional[Tuple[np.ndarray, np.ndarray]]'))
+            310 LOAD_CONST              23 (<code object solve_camera_pose at 0x000001E8641216D0, file "server\positioning.py", line 283>)
+            312 MAKE_FUNCTION            4 (annotations)
+            314 STORE_NAME              35 (solve_camera_pose)
+
+319         316 NOP
+
+320         318 NOP
+
+319         320 NOP
+
+321         322 NOP
+
+319         324 NOP
+
+322         326 NOP
+
+319         328 LOAD_CONST              33 (('stage_point', 'Tuple[float, float, float]', 'config', 'WorkspaceConfig', 'return', 'Tuple[float, float, float]'))
+            330 LOAD_CONST              24 (<code object apply_reach_gain at 0x000001E86474A970, file "server\positioning.py", line 319>)
+            332 MAKE_FUNCTION            4 (annotations)
+            334 STORE_NAME              36 (apply_reach_gain)
+
+333         336 NOP
+
+334         338 NOP
+
+335         340 NOP
+
+331         342 LOAD_CONST              34 ((None, None, None))
+
+332         344 NOP
+
+331         346 NOP
+
+333         348 NOP
+
+331         350 NOP
+
+334         352 NOP
+
+331         354 NOP
+
+335         356 NOP
+
+331         358 NOP
+
+336         360 NOP
+
+331         362 LOAD_CONST              35 (('image_landmarks', 'List[Tuple[float, float, float]]', 'config', 'Optional[WorkspaceConfig]', 'world_landmarks', 'Optional[Sequence[Tuple[float, float, float]]]', 'image_size', 'Optional[Tuple[int, int]]', 'return', 'Tuple[Tuple[float, float, float], Optional[List[Tuple[float, float, float]]]]'))
+            364 LOAD_CONST              25 (<code object estimate_hand_placement at 0x000001E864053070, file "server\positioning.py", line 331>)
+            366 MAKE_FUNCTION            5 (defaults, annotations)
+            368 STORE_NAME              37 (estimate_hand_placement)
+            370 RETURN_CONST             3 (None)

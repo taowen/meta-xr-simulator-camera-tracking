@@ -1,0 +1,38 @@
+# server/pinch.py:101-106  _strength
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  103  LOAD_GLOBAL(NULL + math); LOAD_ATTR(isfinite); LOAD_FAST(gap); CALL; POP_JUMP_IF_TRUE(to 46)
+  104  RETURN_CONST(0.0)
+  105  LOAD_GLOBAL(_APART_PALM_FRACTION); LOAD_GLOBAL(_TOUCHING_PALM_FRACTION); BINARY_OP(-); STORE_FAST(span)
+  106  LOAD_GLOBAL(NULL + min); LOAD_CONST(1.0); LOAD_GLOBAL(NULL + max); LOAD_CONST(0.0); LOAD_GLOBAL(_APART_PALM_FRACTION); LOAD_FAST(gap); BINARY_OP(-); LOAD_FAST(span); BINARY_OP(/); CALL; CALL; RETURN_VALUE
+
+==============================================================================
+verbatim dis listing: server/pinch.py:101-106 _strength
+==============================================================================
+101           0 RESUME                   0
+
+103           2 LOAD_GLOBAL              1 (NULL + math)
+             12 LOAD_ATTR                2 (isfinite)
+             32 LOAD_FAST                0 (gap)
+             34 CALL                     1
+             42 POP_JUMP_IF_TRUE         1 (to 46)
+
+104          44 RETURN_CONST             1 (0.0)
+
+105     >>   46 LOAD_GLOBAL              4 (_APART_PALM_FRACTION)
+             56 LOAD_GLOBAL              6 (_TOUCHING_PALM_FRACTION)
+             66 BINARY_OP               10 (-)
+             70 STORE_FAST               1 (span)
+
+106          72 LOAD_GLOBAL              9 (NULL + min)
+             82 LOAD_CONST               2 (1.0)
+             84 LOAD_GLOBAL             11 (NULL + max)
+             94 LOAD_CONST               1 (0.0)
+             96 LOAD_GLOBAL              4 (_APART_PALM_FRACTION)
+            106 LOAD_FAST                0 (gap)
+            108 BINARY_OP               10 (-)
+            112 LOAD_FAST                1 (span)
+            114 BINARY_OP               11 (/)
+            118 CALL                     2
+            126 CALL                     2
+            134 RETURN_VALUE

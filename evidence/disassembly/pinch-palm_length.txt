@@ -1,0 +1,51 @@
+# server/pinch.py:87-98  palm_length
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+   93  LOAD_GLOBAL(NULL + len); LOAD_FAST(joints); CALL; LOAD_GLOBAL(NULL + max); LOAD_GLOBAL(WRIST); LOAD_GLOBAL(MIDDLE_PROXIMAL); CALL; COMPARE_OP(<=); POP_JUMP_IF_FALSE(to 68)
+   94  RETURN_CONST(None)
+   95  LOAD_GLOBAL(NULL + _distance); LOAD_FAST(joints); LOAD_GLOBAL(WRIST); BINARY_SUBSCR; LOAD_FAST(joints); LOAD_GLOBAL(MIDDLE_PROXIMAL); BINARY_SUBSCR; CALL; STORE_FAST(measured)
+   96  LOAD_GLOBAL(NULL + math); LOAD_ATTR(isfinite); LOAD_FAST(measured); CALL; POP_JUMP_IF_FALSE(to 180); LOAD_FAST(measured); LOAD_GLOBAL(_MIN_CREDIBLE_PALM_LENGTH_M); COMPARE_OP(<); POP_JUMP_IF_FALSE(to 182)
+   97  RETURN_CONST(None)
+   98  LOAD_FAST(measured); RETURN_VALUE
+
+==============================================================================
+verbatim dis listing: server/pinch.py:87-98 palm_length
+==============================================================================
+ 87           0 RESUME                   0
+
+ 93           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (joints)
+             14 CALL                     1
+             22 LOAD_GLOBAL              3 (NULL + max)
+             32 LOAD_GLOBAL              4 (WRIST)
+             42 LOAD_GLOBAL              6 (MIDDLE_PROXIMAL)
+             52 CALL                     2
+             60 COMPARE_OP              26 (<=)
+             64 POP_JUMP_IF_FALSE        1 (to 68)
+
+ 94          66 RETURN_CONST             1 (None)
+
+ 95     >>   68 LOAD_GLOBAL              9 (NULL + _distance)
+             78 LOAD_FAST                0 (joints)
+             80 LOAD_GLOBAL              4 (WRIST)
+             90 BINARY_SUBSCR
+             94 LOAD_FAST                0 (joints)
+             96 LOAD_GLOBAL              6 (MIDDLE_PROXIMAL)
+            106 BINARY_SUBSCR
+            110 CALL                     2
+            118 STORE_FAST               1 (measured)
+
+ 96         120 LOAD_GLOBAL             11 (NULL + math)
+            130 LOAD_ATTR               12 (isfinite)
+            150 LOAD_FAST                1 (measured)
+            152 CALL                     1
+            160 POP_JUMP_IF_FALSE        9 (to 180)
+            162 LOAD_FAST                1 (measured)
+            164 LOAD_GLOBAL             14 (_MIN_CREDIBLE_PALM_LENGTH_M)
+            174 COMPARE_OP               2 (<)
+            178 POP_JUMP_IF_FALSE        1 (to 182)
+
+ 97     >>  180 RETURN_CONST             1 (None)
+
+ 98     >>  182 LOAD_FAST                1 (measured)
+            184 RETURN_VALUE

@@ -1,0 +1,430 @@
+# server/positioning.py:206-262  _solve_translation
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  222  LOAD_GLOBAL(NULL + len); LOAD_FAST(points); CALL; STORE_FAST(count)
+  223  LOAD_GLOBAL(NULL + np); LOAD_ATTR(asarray); LOAD_FAST(image_landmarks); LOAD_GLOBAL(np); LOAD_ATTR(float64); KW_NAMES(('dtype',)); CALL; STORE_FAST(image)
+  224  LOAD_FAST(image); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(0); BUILD_TUPLE; BINARY_SUBSCR; LOAD_CONST(0.5); BINARY_OP(-); LOAD_FAST(config); LOAD_ATTR(focal_length); BINARY_OP(/); STORE_FAST(xn)
+  225  LOAD_FAST(image); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(1); BUILD_TUPLE; BINARY_SUBSCR; LOAD_CONST(0.5); BINARY_OP(-); LOAD_FAST(config); LOAD_ATTR(image_aspect); BINARY_OP(*); LOAD_FAST(config); LOAD_ATTR(focal_length); BINARY_OP(/); STORE_FAST(yn)
+  226  LOAD_GLOBAL(NULL + np); LOAD_ATTR(zeros); LOAD_CONST(2); LOAD_FAST(count); BINARY_OP(*); LOAD_CONST(3); BUILD_TUPLE; CALL; STORE_FAST(a)
+  227  LOAD_GLOBAL(NULL + np); LOAD_ATTR(empty); LOAD_CONST(2); LOAD_FAST(count); BINARY_OP(*); CALL; STORE_FAST(b)
+  228  LOAD_CONST(1.0); LOAD_FAST(a); LOAD_CONST(None); LOAD_FAST(count); BUILD_SLICE; LOAD_CONST(0); BUILD_TUPLE; STORE_SUBSCR
+  229  LOAD_FAST(xn); UNARY_NEGATIVE; LOAD_FAST(a); LOAD_CONST(None); LOAD_FAST(count); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; STORE_SUBSCR
+  230  LOAD_FAST(xn); LOAD_FAST(points); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(*); LOAD_FAST(points); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(0); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(-); LOAD_FAST(b); LOAD_CONST(None); LOAD_FAST(count); STORE_SLICE
+  231  LOAD_CONST(1.0); LOAD_FAST(a); LOAD_FAST(count); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(1); BUILD_TUPLE; STORE_SUBSCR
+  232  LOAD_FAST(yn); UNARY_NEGATIVE; LOAD_FAST(a); LOAD_FAST(count); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; STORE_SUBSCR
+  233  LOAD_FAST(yn); LOAD_FAST(points); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(*); LOAD_FAST(points); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(1); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(-); LOAD_FAST(b); LOAD_FAST(count); LOAD_CONST(None); STORE_SLICE
+  234  LOAD_GLOBAL(np); LOAD_ATTR(linalg); LOAD_ATTR(NULL|self + lstsq); LOAD_FAST(a); LOAD_FAST(b); LOAD_CONST(None); KW_NAMES(('rcond',)); CALL; LOAD_CONST(0); BINARY_SUBSCR; STORE_FAST(translation)
+  237  LOAD_FAST(points); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; BINARY_SUBSCR; LOAD_FAST(translation); LOAD_CONST(2); BINARY_SUBSCR; BINARY_OP(+); STORE_FAST(depth)
+  238  LOAD_GLOBAL(NULL + np); LOAD_ATTR(all); LOAD_GLOBAL(NULL + np); LOAD_ATTR(isfinite); LOAD_FAST(depth); CALL; CALL; POP_JUMP_IF_FALSE(to 732); LOAD_GLOBAL(NULL + np); LOAD_ATTR(median); LOAD_FAST(depth); CALL; LOAD_CONST(0.0); COMPARE_OP(<=); POP_JUMP_IF_FALSE(to 734)
+  239  RETURN_CONST(None)
+  240  LOAD_CONST(1.0); LOAD_GLOBAL(NULL + np); LOAD_ATTR(maximum); LOAD_FAST(depth); LOAD_GLOBAL(_MIN_POINT_DEPTH_M); CALL; BINARY_OP(/); STORE_FAST(weights)
+  241  LOAD_GLOBAL(NULL + np); LOAD_ATTR(concatenate); LOAD_FAST(weights); LOAD_FAST(weights); BUILD_LIST; CALL; STORE_FAST(weights)
+  242  LOAD_GLOBAL(np); LOAD_ATTR(linalg); LOAD_ATTR(NULL|self + lstsq); LOAD_FAST(a); LOAD_FAST(weights); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(None); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(*); LOAD_FAST(b); LOAD_FAST(weights); BINARY_OP(*); LOAD_CONST(None); KW_NAMES(('rcond',)); CALL; LOAD_CONST(0); BINARY_SUBSCR; STORE_FAST(translation)
+  243  LOAD_GLOBAL(NULL + np); LOAD_ATTR(all); LOAD_GLOBAL(NULL + np); LOAD_ATTR(isfinite); LOAD_FAST(translation); CALL; CALL; POP_JUMP_IF_TRUE(to 1020)
+  244  RETURN_CONST(None)
+  245  LOAD_FAST(points); LOAD_GLOBAL(_MP_WRIST); BINARY_SUBSCR; LOAD_FAST(translation); BINARY_OP(+); STORE_FAST(wrist)
+  246  LOAD_CONST(0.0); LOAD_FAST(wrist); LOAD_CONST(2); BINARY_SUBSCR; SWAP; COPY; COMPARE_OP(<); POP_JUMP_IF_FALSE(to 1082); LOAD_GLOBAL(_MAX_CAMERA_DEPTH_M); COMPARE_OP(<=); POP_JUMP_IF_TRUE(to 1086); POP_TOP
+  247  RETURN_CONST(None); RETURN_CONST(None)
+  248  LOAD_FAST(wrist); LOAD_CONST(2); BINARY_SUBSCR; LOAD_GLOBAL(_MIN_CAMERA_DEPTH_M); COMPARE_OP(<); POP_JUMP_IF_FALSE(to 1600)
+  249  LOAD_FAST(points); LOAD_FAST(translation); BINARY_OP(+); STORE_FAST(camera)
+  250  LOAD_GLOBAL(NULL + np); LOAD_ATTR(any); LOAD_FAST(camera); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; BINARY_SUBSCR; LOAD_CONST(0.0); COMPARE_OP(<=); CALL; POP_JUMP_IF_FALSE(to 1184)
+  251  RETURN_CONST(None)
+  252  LOAD_GLOBAL(NULL + np); LOAD_ATTR(hypot); CALL; STORE_FAST(error)
+  253  LOAD_FAST(camera); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(0); BUILD_TUPLE; BINARY_SUBSCR; LOAD_FAST(camera); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(/); LOAD_FAST(xn); BINARY_OP(-); LOAD_FAST(camera); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(1); BUILD_TUPLE; BINARY_SUBSCR; LOAD_FAST(camera); LOAD_CONST(None); LOAD_CONST(None); BUILD_SLICE; LOAD_CONST(2); BUILD_TUPLE; BINARY_SUBSCR; BINARY_OP(/); LOAD_FAST(yn); BINARY_OP(-)
+  255  LOAD_GLOBAL(NULL + max); LOAD_GLOBAL(NULL + np); LOAD_ATTR(ptp); LOAD_FAST(xn); CALL; LOAD_GLOBAL(NULL + np); LOAD_ATTR(ptp); LOAD_FAST(yn); CALL; CALL; STORE_FAST(extent)
+  256  LOAD_GLOBAL(NULL + np); LOAD_ATTR(sqrt); LOAD_GLOBAL(NULL + np); LOAD_ATTR(mean); LOAD_FAST(error); LOAD_CONST(2); BINARY_OP(**); CALL; CALL; LOAD_GLOBAL(_MAX_NEAR_REPROJECTION_ERROR); LOAD_FAST(extent); BINARY_OP(*); COMPARE_OP(>); POP_JUMP_IF_FALSE(to 1516)
+  257  RETURN_CONST(None)
+  260  LOAD_FAST(camera); LOAD_ATTR(NULL|self + mean); LOAD_CONST(0); KW_NAMES(('axis',)); CALL; STORE_FAST(centroid)
+  261  LOAD_FAST(translation); LOAD_FAST(centroid); LOAD_GLOBAL(_MIN_CAMERA_DEPTH_M); LOAD_FAST(wrist); LOAD_CONST(2); BINARY_SUBSCR; BINARY_OP(-); LOAD_FAST(centroid); LOAD_CONST(2); BINARY_SUBSCR; BINARY_OP(/); BINARY_OP(*); BINARY_OP(+=); STORE_FAST(translation)
+  262  LOAD_FAST(translation); RETURN_VALUE
+
+==============================================================================
+verbatim dis listing: server/positioning.py:206-262 _solve_translation
+==============================================================================
+206           0 RESUME                   0
+
+222           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (points)
+             14 CALL                     1
+             22 STORE_FAST               3 (count)
+
+223          24 LOAD_GLOBAL              3 (NULL + np)
+             34 LOAD_ATTR                4 (asarray)
+             54 LOAD_FAST                1 (image_landmarks)
+             56 LOAD_GLOBAL              2 (np)
+             66 LOAD_ATTR                6 (float64)
+             86 KW_NAMES                 1 (('dtype',))
+             88 CALL                     2
+             96 STORE_FAST               4 (image)
+
+224          98 LOAD_FAST                4 (image)
+            100 LOAD_CONST               2 (None)
+            102 LOAD_CONST               2 (None)
+            104 BUILD_SLICE              2
+            106 LOAD_CONST               3 (0)
+            108 BUILD_TUPLE              2
+            110 BINARY_SUBSCR
+            114 LOAD_CONST               4 (0.5)
+            116 BINARY_OP               10 (-)
+            120 LOAD_FAST                2 (config)
+            122 LOAD_ATTR                8 (focal_length)
+            142 BINARY_OP               11 (/)
+            146 STORE_FAST               5 (xn)
+
+225         148 LOAD_FAST                4 (image)
+            150 LOAD_CONST               2 (None)
+            152 LOAD_CONST               2 (None)
+            154 BUILD_SLICE              2
+            156 LOAD_CONST               5 (1)
+            158 BUILD_TUPLE              2
+            160 BINARY_SUBSCR
+            164 LOAD_CONST               4 (0.5)
+            166 BINARY_OP               10 (-)
+            170 LOAD_FAST                2 (config)
+            172 LOAD_ATTR               10 (image_aspect)
+            192 BINARY_OP                5 (*)
+            196 LOAD_FAST                2 (config)
+            198 LOAD_ATTR                8 (focal_length)
+            218 BINARY_OP               11 (/)
+            222 STORE_FAST               6 (yn)
+
+226         224 LOAD_GLOBAL              3 (NULL + np)
+            234 LOAD_ATTR               12 (zeros)
+            254 LOAD_CONST               6 (2)
+            256 LOAD_FAST                3 (count)
+            258 BINARY_OP                5 (*)
+            262 LOAD_CONST               7 (3)
+            264 BUILD_TUPLE              2
+            266 CALL                     1
+            274 STORE_FAST               7 (a)
+
+227         276 LOAD_GLOBAL              3 (NULL + np)
+            286 LOAD_ATTR               14 (empty)
+            306 LOAD_CONST               6 (2)
+            308 LOAD_FAST                3 (count)
+            310 BINARY_OP                5 (*)
+            314 CALL                     1
+            322 STORE_FAST               8 (b)
+
+228         324 LOAD_CONST               8 (1.0)
+            326 LOAD_FAST                7 (a)
+            328 LOAD_CONST               2 (None)
+            330 LOAD_FAST                3 (count)
+            332 BUILD_SLICE              2
+            334 LOAD_CONST               3 (0)
+            336 BUILD_TUPLE              2
+            338 STORE_SUBSCR
+
+229         342 LOAD_FAST                5 (xn)
+            344 UNARY_NEGATIVE
+            346 LOAD_FAST                7 (a)
+            348 LOAD_CONST               2 (None)
+            350 LOAD_FAST                3 (count)
+            352 BUILD_SLICE              2
+            354 LOAD_CONST               6 (2)
+            356 BUILD_TUPLE              2
+            358 STORE_SUBSCR
+
+230         362 LOAD_FAST                5 (xn)
+            364 LOAD_FAST                0 (points)
+            366 LOAD_CONST               2 (None)
+            368 LOAD_CONST               2 (None)
+            370 BUILD_SLICE              2
+            372 LOAD_CONST               6 (2)
+            374 BUILD_TUPLE              2
+            376 BINARY_SUBSCR
+            380 BINARY_OP                5 (*)
+            384 LOAD_FAST                0 (points)
+            386 LOAD_CONST               2 (None)
+            388 LOAD_CONST               2 (None)
+            390 BUILD_SLICE              2
+            392 LOAD_CONST               3 (0)
+            394 BUILD_TUPLE              2
+            396 BINARY_SUBSCR
+            400 BINARY_OP               10 (-)
+            404 LOAD_FAST                8 (b)
+            406 LOAD_CONST               2 (None)
+            408 LOAD_FAST                3 (count)
+            410 STORE_SLICE
+
+231         412 LOAD_CONST               8 (1.0)
+            414 LOAD_FAST                7 (a)
+            416 LOAD_FAST                3 (count)
+            418 LOAD_CONST               2 (None)
+            420 BUILD_SLICE              2
+            422 LOAD_CONST               5 (1)
+            424 BUILD_TUPLE              2
+            426 STORE_SUBSCR
+
+232         430 LOAD_FAST                6 (yn)
+            432 UNARY_NEGATIVE
+            434 LOAD_FAST                7 (a)
+            436 LOAD_FAST                3 (count)
+            438 LOAD_CONST               2 (None)
+            440 BUILD_SLICE              2
+            442 LOAD_CONST               6 (2)
+            444 BUILD_TUPLE              2
+            446 STORE_SUBSCR
+
+233         450 LOAD_FAST                6 (yn)
+            452 LOAD_FAST                0 (points)
+            454 LOAD_CONST               2 (None)
+            456 LOAD_CONST               2 (None)
+            458 BUILD_SLICE              2
+            460 LOAD_CONST               6 (2)
+            462 BUILD_TUPLE              2
+            464 BINARY_SUBSCR
+            468 BINARY_OP                5 (*)
+            472 LOAD_FAST                0 (points)
+            474 LOAD_CONST               2 (None)
+            476 LOAD_CONST               2 (None)
+            478 BUILD_SLICE              2
+            480 LOAD_CONST               5 (1)
+            482 BUILD_TUPLE              2
+            484 BINARY_SUBSCR
+            488 BINARY_OP               10 (-)
+            492 LOAD_FAST                8 (b)
+            494 LOAD_FAST                3 (count)
+            496 LOAD_CONST               2 (None)
+            498 STORE_SLICE
+
+234         500 LOAD_GLOBAL              2 (np)
+            510 LOAD_ATTR               16 (linalg)
+            530 LOAD_ATTR               19 (NULL|self + lstsq)
+            550 LOAD_FAST                7 (a)
+            552 LOAD_FAST                8 (b)
+            554 LOAD_CONST               2 (None)
+            556 KW_NAMES                 9 (('rcond',))
+            558 CALL                     3
+            566 LOAD_CONST               3 (0)
+            568 BINARY_SUBSCR
+            572 STORE_FAST               9 (translation)
+
+237         574 LOAD_FAST                0 (points)
+            576 LOAD_CONST               2 (None)
+            578 LOAD_CONST               2 (None)
+            580 BUILD_SLICE              2
+            582 LOAD_CONST               6 (2)
+            584 BUILD_TUPLE              2
+            586 BINARY_SUBSCR
+            590 LOAD_FAST                9 (translation)
+            592 LOAD_CONST               6 (2)
+            594 BINARY_SUBSCR
+            598 BINARY_OP                0 (+)
+            602 STORE_FAST              10 (depth)
+
+238         604 LOAD_GLOBAL              3 (NULL + np)
+            614 LOAD_ATTR               20 (all)
+            634 LOAD_GLOBAL              3 (NULL + np)
+            644 LOAD_ATTR               22 (isfinite)
+            664 LOAD_FAST               10 (depth)
+            666 CALL                     1
+            674 CALL                     1
+            682 POP_JUMP_IF_FALSE       24 (to 732)
+            684 LOAD_GLOBAL              3 (NULL + np)
+            694 LOAD_ATTR               24 (median)
+            714 LOAD_FAST               10 (depth)
+            716 CALL                     1
+            724 LOAD_CONST              10 (0.0)
+            726 COMPARE_OP              26 (<=)
+            730 POP_JUMP_IF_FALSE        1 (to 734)
+
+239     >>  732 RETURN_CONST             2 (None)
+
+240     >>  734 LOAD_CONST               8 (1.0)
+            736 LOAD_GLOBAL              3 (NULL + np)
+            746 LOAD_ATTR               26 (maximum)
+            766 LOAD_FAST               10 (depth)
+            768 LOAD_GLOBAL             28 (_MIN_POINT_DEPTH_M)
+            778 CALL                     2
+            786 BINARY_OP               11 (/)
+            790 STORE_FAST              11 (weights)
+
+241         792 LOAD_GLOBAL              3 (NULL + np)
+            802 LOAD_ATTR               30 (concatenate)
+            822 LOAD_FAST               11 (weights)
+            824 LOAD_FAST               11 (weights)
+            826 BUILD_LIST               2
+            828 CALL                     1
+            836 STORE_FAST              11 (weights)
+
+242         838 LOAD_GLOBAL              2 (np)
+            848 LOAD_ATTR               16 (linalg)
+            868 LOAD_ATTR               19 (NULL|self + lstsq)
+            888 LOAD_FAST                7 (a)
+            890 LOAD_FAST               11 (weights)
+            892 LOAD_CONST               2 (None)
+            894 LOAD_CONST               2 (None)
+            896 BUILD_SLICE              2
+            898 LOAD_CONST               2 (None)
+            900 BUILD_TUPLE              2
+            902 BINARY_SUBSCR
+            906 BINARY_OP                5 (*)
+            910 LOAD_FAST                8 (b)
+            912 LOAD_FAST               11 (weights)
+            914 BINARY_OP                5 (*)
+            918 LOAD_CONST               2 (None)
+            920 KW_NAMES                 9 (('rcond',))
+            922 CALL                     3
+            930 LOAD_CONST               3 (0)
+            932 BINARY_SUBSCR
+            936 STORE_FAST               9 (translation)
+
+243         938 LOAD_GLOBAL              3 (NULL + np)
+            948 LOAD_ATTR               20 (all)
+            968 LOAD_GLOBAL              3 (NULL + np)
+            978 LOAD_ATTR               22 (isfinite)
+            998 LOAD_FAST                9 (translation)
+           1000 CALL                     1
+           1008 CALL                     1
+           1016 POP_JUMP_IF_TRUE         1 (to 1020)
+
+244        1018 RETURN_CONST             2 (None)
+
+245     >> 1020 LOAD_FAST                0 (points)
+           1022 LOAD_GLOBAL             32 (_MP_WRIST)
+           1032 BINARY_SUBSCR
+           1036 LOAD_FAST                9 (translation)
+           1038 BINARY_OP                0 (+)
+           1042 STORE_FAST              12 (wrist)
+
+246        1044 LOAD_CONST              10 (0.0)
+           1046 LOAD_FAST               12 (wrist)
+           1048 LOAD_CONST               6 (2)
+           1050 BINARY_SUBSCR
+           1054 SWAP                     2
+           1056 COPY                     2
+           1058 COMPARE_OP               2 (<)
+           1062 POP_JUMP_IF_FALSE        9 (to 1082)
+           1064 LOAD_GLOBAL             34 (_MAX_CAMERA_DEPTH_M)
+           1074 COMPARE_OP              26 (<=)
+           1078 POP_JUMP_IF_TRUE         3 (to 1086)
+
+247        1080 RETURN_CONST             2 (None)
+
+246     >> 1082 POP_TOP
+
+247        1084 RETURN_CONST             2 (None)
+
+248     >> 1086 LOAD_FAST               12 (wrist)
+           1088 LOAD_CONST               6 (2)
+           1090 BINARY_SUBSCR
+           1094 LOAD_GLOBAL             36 (_MIN_CAMERA_DEPTH_M)
+           1104 COMPARE_OP               2 (<)
+           1108 POP_JUMP_IF_FALSE      245 (to 1600)
+
+249        1110 LOAD_FAST                0 (points)
+           1112 LOAD_FAST                9 (translation)
+           1114 BINARY_OP                0 (+)
+           1118 STORE_FAST              13 (camera)
+
+250        1120 LOAD_GLOBAL              3 (NULL + np)
+           1130 LOAD_ATTR               38 (any)
+           1150 LOAD_FAST               13 (camera)
+           1152 LOAD_CONST               2 (None)
+           1154 LOAD_CONST               2 (None)
+           1156 BUILD_SLICE              2
+           1158 LOAD_CONST               6 (2)
+           1160 BUILD_TUPLE              2
+           1162 BINARY_SUBSCR
+           1166 LOAD_CONST              10 (0.0)
+           1168 COMPARE_OP              26 (<=)
+           1172 CALL                     1
+           1180 POP_JUMP_IF_FALSE        1 (to 1184)
+
+251        1182 RETURN_CONST             2 (None)
+
+252     >> 1184 LOAD_GLOBAL              3 (NULL + np)
+           1194 LOAD_ATTR               40 (hypot)
+
+253        1214 LOAD_FAST               13 (camera)
+           1216 LOAD_CONST               2 (None)
+           1218 LOAD_CONST               2 (None)
+           1220 BUILD_SLICE              2
+           1222 LOAD_CONST               3 (0)
+           1224 BUILD_TUPLE              2
+           1226 BINARY_SUBSCR
+           1230 LOAD_FAST               13 (camera)
+           1232 LOAD_CONST               2 (None)
+           1234 LOAD_CONST               2 (None)
+           1236 BUILD_SLICE              2
+           1238 LOAD_CONST               6 (2)
+           1240 BUILD_TUPLE              2
+           1242 BINARY_SUBSCR
+           1246 BINARY_OP               11 (/)
+           1250 LOAD_FAST                5 (xn)
+           1252 BINARY_OP               10 (-)
+           1256 LOAD_FAST               13 (camera)
+           1258 LOAD_CONST               2 (None)
+           1260 LOAD_CONST               2 (None)
+           1262 BUILD_SLICE              2
+           1264 LOAD_CONST               5 (1)
+           1266 BUILD_TUPLE              2
+           1268 BINARY_SUBSCR
+           1272 LOAD_FAST               13 (camera)
+           1274 LOAD_CONST               2 (None)
+           1276 LOAD_CONST               2 (None)
+           1278 BUILD_SLICE              2
+           1280 LOAD_CONST               6 (2)
+           1282 BUILD_TUPLE              2
+           1284 BINARY_SUBSCR
+           1288 BINARY_OP               11 (/)
+           1292 LOAD_FAST                6 (yn)
+           1294 BINARY_OP               10 (-)
+
+252        1298 CALL                     2
+           1306 STORE_FAST              14 (error)
+
+255        1308 LOAD_GLOBAL             43 (NULL + max)
+           1318 LOAD_GLOBAL              3 (NULL + np)
+           1328 LOAD_ATTR               44 (ptp)
+           1348 LOAD_FAST                5 (xn)
+           1350 CALL                     1
+           1358 LOAD_GLOBAL              3 (NULL + np)
+           1368 LOAD_ATTR               44 (ptp)
+           1388 LOAD_FAST                6 (yn)
+           1390 CALL                     1
+           1398 CALL                     2
+           1406 STORE_FAST              15 (extent)
+
+256        1408 LOAD_GLOBAL              3 (NULL + np)
+           1418 LOAD_ATTR               46 (sqrt)
+           1438 LOAD_GLOBAL              3 (NULL + np)
+           1448 LOAD_ATTR               48 (mean)
+           1468 LOAD_FAST               14 (error)
+           1470 LOAD_CONST               6 (2)
+           1472 BINARY_OP                8 (**)
+           1476 CALL                     1
+           1484 CALL                     1
+           1492 LOAD_GLOBAL             50 (_MAX_NEAR_REPROJECTION_ERROR)
+           1502 LOAD_FAST               15 (extent)
+           1504 BINARY_OP                5 (*)
+           1508 COMPARE_OP              68 (>)
+           1512 POP_JUMP_IF_FALSE        1 (to 1516)
+
+257        1514 RETURN_CONST             2 (None)
+
+260     >> 1516 LOAD_FAST               13 (camera)
+           1518 LOAD_ATTR               49 (NULL|self + mean)
+           1538 LOAD_CONST               3 (0)
+           1540 KW_NAMES                11 (('axis',))
+           1542 CALL                     1
+           1550 STORE_FAST              16 (centroid)
+
+261        1552 LOAD_FAST                9 (translation)
+           1554 LOAD_FAST               16 (centroid)
+           1556 LOAD_GLOBAL             36 (_MIN_CAMERA_DEPTH_M)
+           1566 LOAD_FAST               12 (wrist)
+           1568 LOAD_CONST               6 (2)
+           1570 BINARY_SUBSCR
+           1574 BINARY_OP               10 (-)
+           1578 LOAD_FAST               16 (centroid)
+           1580 LOAD_CONST               6 (2)
+           1582 BINARY_SUBSCR
+           1586 BINARY_OP               11 (/)
+           1590 BINARY_OP                5 (*)
+           1594 BINARY_OP               13 (+=)
+           1598 STORE_FAST               9 (translation)
+
+262     >> 1600 LOAD_FAST                9 (translation)
+           1602 RETURN_VALUE

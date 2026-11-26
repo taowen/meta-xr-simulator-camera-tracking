@@ -1,0 +1,181 @@
+# server/pinch.py:1-133  <module>
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+    3  LOAD_CONST("Per-finger pinch strength derived from a retargeted OpenXR hand skeleton.\n\nThe capture backend reports joints, not gestures, so pinch has to be measured\nfrom the skeleton. Strength is the thumb-tip-to-finger-tip distance mapped onto\n[0, 1], and the two ends of that ramp are expressed as fractions of the hand's\nown palm length rather than absolute metres. That keeps a small hand pinching\nat the same reported strength as a large one, and keeps the ramp stable when\nthe retargeter rescales a hand that moved closer to or further from the camera.\n\nWhen the detector's image landmarks are available they are measured too, and a\nfinger only counts as closed when both agree. The skeleton is built from\nMediaPipe's world landmarks, whose fingertip gap is unreliable for some poses:\na touching left-hand pinch facing the camera reads about 0.29 palm lengths\napart, the same as a C-shaped hand with a visible gap. The image landmarks place\nthe tips precisely in the image plane but cannot see depth, so a thumb behind\nthe index finger overlaps it there without touching it.\n\nThe output is shaped to match ``XrHandTrackingAimStateFB`` so the runtime can\nforward it without rescaling.\n"); STORE_NAME(__doc__)
+   24  LOAD_CONST(0); LOAD_CONST(('annotations',)); IMPORT_FROM(annotations); STORE_NAME(annotations); POP_TOP
+   26  LOAD_CONST(0); LOAD_CONST(None); STORE_NAME(math)
+   27  LOAD_CONST(0); LOAD_CONST(('dataclass',)); IMPORT_FROM(dataclass); STORE_NAME(dataclass); POP_TOP
+   28  LOAD_CONST(0); LOAD_CONST(('Sequence',)); IMPORT_FROM(Sequence); STORE_NAME(Sequence); POP_TOP
+   30  LOAD_CONST(0); LOAD_CONST(('INDEX_TIP', 'JointPose', 'LITTLE_TIP', 'MIDDLE_PROXIMAL', 'MIDDLE_TIP', 'RING_TIP', 'THUMB_TIP', 'WRIST')); IMPORT_FROM(INDEX_TIP); STORE_NAME(INDEX_TIP); IMPORT_FROM(JointPose); STORE_NAME(JointPose); IMPORT_FROM(LITTLE_TIP); STORE_NAME(LITTLE_TIP); IMPORT_FROM(MIDDLE_PROXIMAL); STORE_NAME(MIDDLE_PROXIMAL); IMPORT_FROM(MIDDLE_TIP); STORE_NAME(MIDDLE_TIP); IMPORT_FROM(RING_TIP); STORE_NAME(RING_TIP); IMPORT_FROM(THUMB_TIP); STORE_NAME(THUMB_TIP); IMPORT_FROM(WRIST); STORE_NAME(WRIST); POP_TOP
+   46  LOAD_CONST(0.22); STORE_NAME(_TOUCHING_PALM_FRACTION)
+   47  LOAD_CONST(0.75); STORE_NAME(_APART_PALM_FRACTION)
+   53  LOAD_CONST(0.01); STORE_NAME(_MIN_CREDIBLE_PALM_LENGTH_M)
+   55  LOAD_NAME(INDEX_TIP); LOAD_NAME(MIDDLE_TIP); LOAD_NAME(RING_TIP); LOAD_NAME(LITTLE_TIP); BUILD_TUPLE; STORE_NAME(_FINGER_TIPS)
+   58  LOAD_CONST(0); STORE_NAME(_MP_WRIST)
+   59  LOAD_CONST(4); STORE_NAME(_MP_THUMB_TIP)
+   60  LOAD_CONST(9); STORE_NAME(_MP_MIDDLE_MCP)
+   61  LOAD_CONST((8, 12, 16, 20)); STORE_NAME(_MP_FINGER_TIPS)
+   67  LOAD_CONST(0.06); STORE_NAME(_SKELETON_SLACK_PALM_FRACTION)
+   70  PUSH_NULL; LOAD_NAME(dataclass); LOAD_CONST(True); KW_NAMES(('frozen',)); CALL; CALL
+   71  PUSH_NULL; LOAD_BUILD_CLASS; LOAD_CONST(<code object PinchStrengths at 0x000001E864809350, file "server\pinch.py", line 70>); MAKE_FUNCTION; LOAD_CONST('PinchStrengths'); CALL; STORE_NAME(PinchStrengths)
+   80  LOAD_CONST(('a', 'JointPose', 'b', 'JointPose', 'return', 'float')); LOAD_CONST(<code object _distance at 0x000001E86477D390, file "server\pinch.py", line 80>); MAKE_FUNCTION(annotations); STORE_NAME(_distance)
+   87  LOAD_CONST(('joints', 'Sequence[JointPose]', 'return', 'float | None')); LOAD_CONST(<code object palm_length at 0x000001E86427F630, file "server\pinch.py", line 87>); MAKE_FUNCTION(annotations); STORE_NAME(palm_length)
+  101  LOAD_CONST(('gap', 'float', 'return', 'float')); LOAD_CONST(<code object _strength at 0x000001E864742F70, file "server\pinch.py", line 101>); MAKE_FUNCTION(annotations); STORE_NAME(_strength)
+  109  NOP; NOP; LOAD_CONST(('image_points', 'Sequence[Sequence[float]] | None', 'return', 'list[float] | None')); LOAD_CONST(<code object _image_gaps at 0x000001E864120450, file "server\pinch.py", line 109>); MAKE_FUNCTION(annotations); STORE_NAME(_image_gaps)
+  110  NOP
+  111  NOP
+  130  LOAD_CONST((None,)); NOP; NOP; LOAD_CONST(('joints', 'Sequence[JointPose]', 'image_points', 'Sequence[Sequence[float]] | None', 'return', 'PinchStrengths | None')); LOAD_CONST(<code object pinch_strengths at 0x000001E8640E2E80, file "server\pinch.py", line 130>); MAKE_FUNCTION(defaults, annotations); STORE_NAME(pinch_strengths); RETURN_CONST(None)
+  131  NOP
+  132  NOP; NOP
+  133  NOP
+
+==============================================================================
+verbatim dis listing: server/pinch.py:1-133 <module>
+==============================================================================
+  0           0 RESUME                   0
+
+  3           2 LOAD_CONST               0 ("Per-finger pinch strength derived from a retargeted OpenXR hand skeleton.\n\nThe capture backend reports joints, not gestures, so pinch has to be measured\nfrom the skeleton. Strength is the thumb-tip-to-finger-tip distance mapped onto\n[0, 1], and the two ends of that ramp are expressed as fractions of the hand's\nown palm length rather than absolute metres. That keeps a small hand pinching\nat the same reported strength as a large one, and keeps the ramp stable when\nthe retargeter rescales a hand that moved closer to or further from the camera.\n\nWhen the detector's image landmarks are available they are measured too, and a\nfinger only counts as closed when both agree. The skeleton is built from\nMediaPipe's world landmarks, whose fingertip gap is unreliable for some poses:\na touching left-hand pinch facing the camera reads about 0.29 palm lengths\napart, the same as a C-shaped hand with a visible gap. The image landmarks place\nthe tips precisely in the image plane but cannot see depth, so a thumb behind\nthe index finger overlaps it there without touching it.\n\nThe output is shaped to match ``XrHandTrackingAimStateFB`` so the runtime can\nforward it without rescaling.\n")
+              4 STORE_NAME               0 (__doc__)
+
+ 24           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 CACHE
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 26          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 CACHE
+             24 STORE_NAME               3 (math)
+
+ 27          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('dataclass',))
+             30 CACHE
+             32 IMPORT_FROM              5 (dataclass)
+             34 STORE_NAME               5 (dataclass)
+             36 POP_TOP
+
+ 28          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('Sequence',))
+             42 CACHE
+             44 IMPORT_FROM              7 (Sequence)
+             46 STORE_NAME               7 (Sequence)
+             48 POP_TOP
+
+ 30          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               6 (('INDEX_TIP', 'JointPose', 'LITTLE_TIP', 'MIDDLE_PROXIMAL', 'MIDDLE_TIP', 'RING_TIP', 'THUMB_TIP', 'WRIST'))
+             54 CACHE
+             56 IMPORT_FROM              9 (INDEX_TIP)
+             58 STORE_NAME               9 (INDEX_TIP)
+             60 IMPORT_FROM             10 (JointPose)
+             62 STORE_NAME              10 (JointPose)
+             64 IMPORT_FROM             11 (LITTLE_TIP)
+             66 STORE_NAME              11 (LITTLE_TIP)
+             68 IMPORT_FROM             12 (MIDDLE_PROXIMAL)
+             70 STORE_NAME              12 (MIDDLE_PROXIMAL)
+             72 IMPORT_FROM             13 (MIDDLE_TIP)
+             74 STORE_NAME              13 (MIDDLE_TIP)
+             76 IMPORT_FROM             14 (RING_TIP)
+             78 STORE_NAME              14 (RING_TIP)
+             80 IMPORT_FROM             15 (THUMB_TIP)
+             82 STORE_NAME              15 (THUMB_TIP)
+             84 IMPORT_FROM             16 (WRIST)
+             86 STORE_NAME              16 (WRIST)
+             88 POP_TOP
+
+ 46          90 LOAD_CONST               7 (0.22)
+             92 STORE_NAME              17 (_TOUCHING_PALM_FRACTION)
+
+ 47          94 LOAD_CONST               8 (0.75)
+             96 STORE_NAME              18 (_APART_PALM_FRACTION)
+
+ 53          98 LOAD_CONST               9 (0.01)
+            100 STORE_NAME              19 (_MIN_CREDIBLE_PALM_LENGTH_M)
+
+ 55         102 LOAD_NAME                9 (INDEX_TIP)
+            104 LOAD_NAME               13 (MIDDLE_TIP)
+            106 LOAD_NAME               14 (RING_TIP)
+            108 LOAD_NAME               11 (LITTLE_TIP)
+            110 BUILD_TUPLE              4
+            112 STORE_NAME              20 (_FINGER_TIPS)
+
+ 58         114 LOAD_CONST               1 (0)
+            116 STORE_NAME              21 (_MP_WRIST)
+
+ 59         118 LOAD_CONST              10 (4)
+            120 STORE_NAME              22 (_MP_THUMB_TIP)
+
+ 60         122 LOAD_CONST              11 (9)
+            124 STORE_NAME              23 (_MP_MIDDLE_MCP)
+
+ 61         126 LOAD_CONST              12 ((8, 12, 16, 20))
+            128 STORE_NAME              24 (_MP_FINGER_TIPS)
+
+ 67         130 LOAD_CONST              13 (0.06)
+            132 STORE_NAME              25 (_SKELETON_SLACK_PALM_FRACTION)
+
+ 70         134 PUSH_NULL
+            136 LOAD_NAME                5 (dataclass)
+            138 LOAD_CONST              14 (True)
+            140 KW_NAMES                15 (('frozen',))
+            142 CALL                     1
+
+ 71         150 PUSH_NULL
+            152 LOAD_BUILD_CLASS
+            154 LOAD_CONST              16 (<code object PinchStrengths at 0x000001E864809350, file "server\pinch.py", line 70>)
+            156 MAKE_FUNCTION            0
+            158 LOAD_CONST              17 ('PinchStrengths')
+            160 CALL                     2
+
+ 70         168 CALL                     0
+
+ 71         176 STORE_NAME              26 (PinchStrengths)
+
+ 80         178 LOAD_CONST              23 (('a', 'JointPose', 'b', 'JointPose', 'return', 'float'))
+            180 LOAD_CONST              18 (<code object _distance at 0x000001E86477D390, file "server\pinch.py", line 80>)
+            182 MAKE_FUNCTION            4 (annotations)
+            184 STORE_NAME              27 (_distance)
+
+ 87         186 LOAD_CONST              24 (('joints', 'Sequence[JointPose]', 'return', 'float | None'))
+            188 LOAD_CONST              19 (<code object palm_length at 0x000001E86427F630, file "server\pinch.py", line 87>)
+            190 MAKE_FUNCTION            4 (annotations)
+            192 STORE_NAME              28 (palm_length)
+
+101         194 LOAD_CONST              25 (('gap', 'float', 'return', 'float'))
+            196 LOAD_CONST              20 (<code object _strength at 0x000001E864742F70, file "server\pinch.py", line 101>)
+            198 MAKE_FUNCTION            4 (annotations)
+            200 STORE_NAME              29 (_strength)
+
+109         202 NOP
+
+110         204 NOP
+
+109         206 NOP
+
+111         208 NOP
+
+109         210 LOAD_CONST              26 (('image_points', 'Sequence[Sequence[float]] | None', 'return', 'list[float] | None'))
+            212 LOAD_CONST              21 (<code object _image_gaps at 0x000001E864120450, file "server\pinch.py", line 109>)
+            214 MAKE_FUNCTION            4 (annotations)
+            216 STORE_NAME              30 (_image_gaps)
+
+132         218 NOP
+
+130         220 LOAD_CONST              27 ((None,))
+
+131         222 NOP
+
+130         224 NOP
+
+132         226 NOP
+
+130         228 NOP
+
+133         230 NOP
+
+130         232 LOAD_CONST              28 (('joints', 'Sequence[JointPose]', 'image_points', 'Sequence[Sequence[float]] | None', 'return', 'PinchStrengths | None'))
+            234 LOAD_CONST              22 (<code object pinch_strengths at 0x000001E8640E2E80, file "server\pinch.py", line 130>)
+            236 MAKE_FUNCTION            5 (defaults, annotations)
+            238 STORE_NAME              31 (pinch_strengths)
+            240 RETURN_CONST             3 (None)

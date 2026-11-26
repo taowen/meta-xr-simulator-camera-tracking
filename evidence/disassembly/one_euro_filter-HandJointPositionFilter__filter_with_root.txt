@@ -1,0 +1,359 @@
+# server/one_euro_filter.py:217-253  HandJointPositionFilter._filter_with_root
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  217  MAKE_CELL(positions); MAKE_CELL(axis)
+  223  LOAD_FAST_AND_CLEAR(axis); MAKE_CELL(axis); SWAP; BUILD_LIST; SWAP; STORE_FAST(raw_root); STORE_FAST(axis); SWAP; STORE_FAST(axis); RERAISE; SWAP; POP_TOP
+  224  LOAD_GLOBAL(NULL + sum); LOAD_CLOSURE(axis); LOAD_CLOSURE(positions); BUILD_TUPLE; LOAD_CONST(<code object <genexpr> at 0x000001E8647D9110, file "server\one_euro_filter.py", line 224>); MAKE_FUNCTION(closure); LOAD_GLOBAL(_PALM_JOINTS); GET_ITER; CALL; CALL; LOAD_GLOBAL(NULL + len); LOAD_GLOBAL(_PALM_JOINTS); CALL; BINARY_OP(/); LIST_APPEND; JUMP_BACKWARD(to 38)
+  225  LOAD_GLOBAL(NULL + range); LOAD_CONST(3); CALL; GET_ITER; FOR_ITER(to 128); STORE_DEREF(axis); END_FOR
+  227  LOAD_GLOBAL(NULL + zip); LOAD_FAST(self); LOAD_ATTR(_root); LOAD_FAST(raw_root); CALL; GET_ITER; LOAD_FAST_AND_CLEAR(f); LOAD_FAST_AND_CLEAR(value); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 220); UNPACK_SEQUENCE; STORE_FAST(f); STORE_FAST(value); PUSH_NULL; LOAD_FAST(f); LOAD_FAST(value); LOAD_FAST(t_s); CALL; LIST_APPEND; JUMP_BACKWARD(to 188); END_FOR; STORE_FAST(root); STORE_FAST(f); STORE_FAST(value); SWAP; STORE_FAST(value); STORE_FAST(f); RERAISE; SWAP; POP_TOP
+  228  LOAD_FAST(prediction_s); LOAD_CONST(0.0); COMPARE_OP(>); POP_JUMP_IF_FALSE(to 712)
+  234  LOAD_FAST(self); LOAD_ATTR(_root); GET_ITER; LOAD_FAST_AND_CLEAR(f); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 302); STORE_FAST(f); LOAD_FAST(f); LOAD_ATTR(velocity); LIST_APPEND; JUMP_BACKWARD(to 270); END_FOR; STORE_FAST(velocity); STORE_FAST(f); SWAP; STORE_FAST(f); RERAISE; SWAP; POP_TOP
+  235  LOAD_GLOBAL(NULL + math); LOAD_ATTR(sqrt); LOAD_GLOBAL(NULL + sum); LOAD_CONST(<code object <genexpr> at 0x000001E8647D9200, file "server\one_euro_filter.py", line 235>); MAKE_FUNCTION; LOAD_FAST(velocity); GET_ITER; CALL; CALL; CALL; STORE_FAST(speed)
+  236  LOAD_GLOBAL(_ROOT_PREDICTION_SPEED); UNPACK_SEQUENCE; STORE_FAST(low); STORE_FAST(high)
+  237  LOAD_GLOBAL(NULL + min); LOAD_CONST(1.0); LOAD_GLOBAL(NULL + max); LOAD_CONST(0.0); LOAD_FAST(speed); LOAD_FAST(low); BINARY_OP(-); LOAD_FAST(high); LOAD_FAST(low); BINARY_OP(-); BINARY_OP(/); CALL; CALL; STORE_FAST(ramp)
+  238  LOAD_FAST(velocity); GET_ITER; LOAD_FAST_AND_CLEAR(v); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 498); STORE_FAST(v); LOAD_FAST(v); LOAD_FAST(ramp); BINARY_OP(*); LOAD_FAST(prediction_s); BINARY_OP(*); LIST_APPEND; JUMP_BACKWARD(to 474); END_FOR; STORE_FAST(delta); STORE_FAST(v); SWAP; STORE_FAST(v); RERAISE; SWAP; POP_TOP
+  239  LOAD_GLOBAL(NULL + math); LOAD_ATTR(sqrt); LOAD_GLOBAL(NULL + sum); LOAD_CONST(<code object <genexpr> at 0x000001E8647D94D0, file "server\one_euro_filter.py", line 239>); MAKE_FUNCTION; LOAD_FAST(delta); GET_ITER; CALL; CALL; CALL; STORE_FAST(length)
+  240  LOAD_FAST(length); LOAD_GLOBAL(_ROOT_PREDICTION_MAX_DISTANCE); COMPARE_OP(>); POP_JUMP_IF_FALSE(to 646)
+  241  LOAD_FAST(delta); GET_ITER; LOAD_FAST_AND_CLEAR(d); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 640); STORE_FAST(d); LOAD_FAST(d); LOAD_GLOBAL(_ROOT_PREDICTION_MAX_DISTANCE); BINARY_OP(*); LOAD_FAST(length); BINARY_OP(/); LIST_APPEND; JUMP_BACKWARD(to 608); END_FOR; STORE_FAST(delta); STORE_FAST(d); SWAP; STORE_FAST(d); RERAISE; SWAP; POP_TOP
+  242  LOAD_GLOBAL(NULL + zip); LOAD_FAST(root); LOAD_FAST(delta); CALL; GET_ITER; LOAD_FAST_AND_CLEAR(r); LOAD_FAST_AND_CLEAR(d); SWAP; BUILD_LIST; SWAP; FOR_ITER(to 704); UNPACK_SEQUENCE; STORE_FAST(r); STORE_FAST(d); LOAD_FAST(r); LOAD_FAST(d); BINARY_OP(+); LIST_APPEND; JUMP_BACKWARD(to 680); END_FOR; STORE_FAST(root); STORE_FAST(r); STORE_FAST(d); SWAP; STORE_FAST(d); STORE_FAST(r); RERAISE
+  243  BUILD_LIST; STORE_FAST(out)
+  244  LOAD_GLOBAL(NULL + enumerate); LOAD_DEREF(positions); CALL; GET_ITER; FOR_ITER(to 962); UNPACK_SEQUENCE; STORE_FAST(i); STORE_FAST(position); END_FOR
+  245  LOAD_FAST(self); LOAD_ATTR(_filters); LOAD_FAST(i); BINARY_SUBSCR; UNPACK_SEQUENCE; STORE_FAST(fx); STORE_FAST(fy); STORE_FAST(fz)
+  246  LOAD_FAST(out); LOAD_ATTR(NULL|self + append); CALL; POP_TOP; JUMP_BACKWARD(to 738)
+  247  BUILD_TUPLE
+  248  LOAD_FAST(root); LOAD_CONST(0); BINARY_SUBSCR; PUSH_NULL; LOAD_FAST(fx); LOAD_FAST(position); LOAD_CONST(0); BINARY_SUBSCR; LOAD_FAST(raw_root); LOAD_CONST(0); BINARY_SUBSCR; BINARY_OP(-); LOAD_FAST(t_s); CALL; BINARY_OP(+)
+  249  LOAD_FAST(root); LOAD_CONST(1); BINARY_SUBSCR; PUSH_NULL; LOAD_FAST(fy); LOAD_FAST(position); LOAD_CONST(1); BINARY_SUBSCR; LOAD_FAST(raw_root); LOAD_CONST(1); BINARY_SUBSCR; BINARY_OP(-); LOAD_FAST(t_s); CALL; BINARY_OP(+)
+  250  LOAD_FAST(root); LOAD_CONST(2); BINARY_SUBSCR; PUSH_NULL; LOAD_FAST(fz); LOAD_FAST(position); LOAD_CONST(2); BINARY_SUBSCR; LOAD_FAST(raw_root); LOAD_CONST(2); BINARY_SUBSCR; BINARY_OP(-); LOAD_FAST(t_s); CALL; BINARY_OP(+)
+  253  LOAD_FAST(out); RETURN_VALUE; SWAP; POP_TOP
+
+==============================================================================
+verbatim dis listing: server/one_euro_filter.py:217-253 HandJointPositionFilter._filter_with_root
+==============================================================================
+              0 MAKE_CELL                1 (positions)
+              2 MAKE_CELL                4 (axis)
+
+217           4 RESUME                   0
+
+225           6 LOAD_GLOBAL              1 (NULL + range)
+             16 LOAD_CONST               1 (3)
+             18 CALL                     1
+             26 GET_ITER
+
+223          28 LOAD_FAST_AND_CLEAR      4 (axis)
+             30 MAKE_CELL                4 (axis)
+             32 SWAP                     2
+             34 BUILD_LIST               0
+             36 SWAP                     2
+
+225     >>   38 FOR_ITER                43 (to 128)
+             42 STORE_DEREF              4 (axis)
+
+224          44 LOAD_GLOBAL              3 (NULL + sum)
+             54 LOAD_CLOSURE             4 (axis)
+             56 LOAD_CLOSURE             1 (positions)
+             58 BUILD_TUPLE              2
+             60 LOAD_CONST               2 (<code object <genexpr> at 0x000001E8647D9110, file "server\one_euro_filter.py", line 224>)
+             62 MAKE_FUNCTION            8 (closure)
+             64 LOAD_GLOBAL              4 (_PALM_JOINTS)
+             74 GET_ITER
+             76 CALL                     0
+             84 CALL                     1
+             92 LOAD_GLOBAL              7 (NULL + len)
+            102 LOAD_GLOBAL              4 (_PALM_JOINTS)
+            112 CALL                     1
+            120 BINARY_OP               11 (/)
+            124 LIST_APPEND              2
+            126 JUMP_BACKWARD           45 (to 38)
+
+225     >>  128 END_FOR
+
+223         130 STORE_FAST               5 (raw_root)
+            132 STORE_FAST               4 (axis)
+
+227         134 LOAD_GLOBAL              9 (NULL + zip)
+            144 LOAD_FAST                0 (self)
+            146 LOAD_ATTR               10 (_root)
+            166 LOAD_FAST                5 (raw_root)
+            168 CALL                     2
+            176 GET_ITER
+            178 LOAD_FAST_AND_CLEAR      6 (f)
+            180 LOAD_FAST_AND_CLEAR      7 (value)
+            182 SWAP                     3
+            184 BUILD_LIST               0
+            186 SWAP                     2
+        >>  188 FOR_ITER                14 (to 220)
+            192 UNPACK_SEQUENCE          2
+            196 STORE_FAST               6 (f)
+            198 STORE_FAST               7 (value)
+            200 PUSH_NULL
+            202 LOAD_FAST                6 (f)
+            204 LOAD_FAST                7 (value)
+            206 LOAD_FAST                2 (t_s)
+            208 CALL                     2
+            216 LIST_APPEND              2
+            218 JUMP_BACKWARD           16 (to 188)
+        >>  220 END_FOR
+            222 STORE_FAST               8 (root)
+            224 STORE_FAST               6 (f)
+            226 STORE_FAST               7 (value)
+
+228         228 LOAD_FAST                3 (prediction_s)
+            230 LOAD_CONST               3 (0.0)
+            232 COMPARE_OP              68 (>)
+            236 POP_JUMP_IF_FALSE      237 (to 712)
+
+234         238 LOAD_FAST                0 (self)
+            240 LOAD_ATTR               10 (_root)
+            260 GET_ITER
+            262 LOAD_FAST_AND_CLEAR      6 (f)
+            264 SWAP                     2
+            266 BUILD_LIST               0
+            268 SWAP                     2
+        >>  270 FOR_ITER                14 (to 302)
+            274 STORE_FAST               6 (f)
+            276 LOAD_FAST                6 (f)
+            278 LOAD_ATTR               12 (velocity)
+            298 LIST_APPEND              2
+            300 JUMP_BACKWARD           16 (to 270)
+        >>  302 END_FOR
+            304 STORE_FAST               9 (velocity)
+            306 STORE_FAST               6 (f)
+
+235         308 LOAD_GLOBAL             15 (NULL + math)
+            318 LOAD_ATTR               16 (sqrt)
+            338 LOAD_GLOBAL              3 (NULL + sum)
+            348 LOAD_CONST               4 (<code object <genexpr> at 0x000001E8647D9200, file "server\one_euro_filter.py", line 235>)
+            350 MAKE_FUNCTION            0
+            352 LOAD_FAST                9 (velocity)
+            354 GET_ITER
+            356 CALL                     0
+            364 CALL                     1
+            372 CALL                     1
+            380 STORE_FAST              10 (speed)
+
+236         382 LOAD_GLOBAL             18 (_ROOT_PREDICTION_SPEED)
+            392 UNPACK_SEQUENCE          2
+            396 STORE_FAST              11 (low)
+            398 STORE_FAST              12 (high)
+
+237         400 LOAD_GLOBAL             21 (NULL + min)
+            410 LOAD_CONST               5 (1.0)
+            412 LOAD_GLOBAL             23 (NULL + max)
+            422 LOAD_CONST               3 (0.0)
+            424 LOAD_FAST               10 (speed)
+            426 LOAD_FAST               11 (low)
+            428 BINARY_OP               10 (-)
+            432 LOAD_FAST               12 (high)
+            434 LOAD_FAST               11 (low)
+            436 BINARY_OP               10 (-)
+            440 BINARY_OP               11 (/)
+            444 CALL                     2
+            452 CALL                     2
+            460 STORE_FAST              13 (ramp)
+
+238         462 LOAD_FAST                9 (velocity)
+            464 GET_ITER
+            466 LOAD_FAST_AND_CLEAR     14 (v)
+            468 SWAP                     2
+            470 BUILD_LIST               0
+            472 SWAP                     2
+        >>  474 FOR_ITER                10 (to 498)
+            478 STORE_FAST              14 (v)
+            480 LOAD_FAST               14 (v)
+            482 LOAD_FAST               13 (ramp)
+            484 BINARY_OP                5 (*)
+            488 LOAD_FAST                3 (prediction_s)
+            490 BINARY_OP                5 (*)
+            494 LIST_APPEND              2
+            496 JUMP_BACKWARD           12 (to 474)
+        >>  498 END_FOR
+            500 STORE_FAST              15 (delta)
+            502 STORE_FAST              14 (v)
+
+239         504 LOAD_GLOBAL             15 (NULL + math)
+            514 LOAD_ATTR               16 (sqrt)
+            534 LOAD_GLOBAL              3 (NULL + sum)
+            544 LOAD_CONST               6 (<code object <genexpr> at 0x000001E8647D94D0, file "server\one_euro_filter.py", line 239>)
+            546 MAKE_FUNCTION            0
+            548 LOAD_FAST               15 (delta)
+            550 GET_ITER
+            552 CALL                     0
+            560 CALL                     1
+            568 CALL                     1
+            576 STORE_FAST              16 (length)
+
+240         578 LOAD_FAST               16 (length)
+            580 LOAD_GLOBAL             24 (_ROOT_PREDICTION_MAX_DISTANCE)
+            590 COMPARE_OP              68 (>)
+            594 POP_JUMP_IF_FALSE       25 (to 646)
+
+241         596 LOAD_FAST               15 (delta)
+            598 GET_ITER
+            600 LOAD_FAST_AND_CLEAR     17 (d)
+            602 SWAP                     2
+            604 BUILD_LIST               0
+            606 SWAP                     2
+        >>  608 FOR_ITER                14 (to 640)
+            612 STORE_FAST              17 (d)
+            614 LOAD_FAST               17 (d)
+            616 LOAD_GLOBAL             24 (_ROOT_PREDICTION_MAX_DISTANCE)
+            626 BINARY_OP                5 (*)
+            630 LOAD_FAST               16 (length)
+            632 BINARY_OP               11 (/)
+            636 LIST_APPEND              2
+            638 JUMP_BACKWARD           16 (to 608)
+        >>  640 END_FOR
+            642 STORE_FAST              15 (delta)
+            644 STORE_FAST              17 (d)
+
+242     >>  646 LOAD_GLOBAL              9 (NULL + zip)
+            656 LOAD_FAST                8 (root)
+            658 LOAD_FAST               15 (delta)
+            660 CALL                     2
+            668 GET_ITER
+            670 LOAD_FAST_AND_CLEAR     18 (r)
+            672 LOAD_FAST_AND_CLEAR     17 (d)
+            674 SWAP                     3
+            676 BUILD_LIST               0
+            678 SWAP                     2
+        >>  680 FOR_ITER                10 (to 704)
+            684 UNPACK_SEQUENCE          2
+            688 STORE_FAST              18 (r)
+            690 STORE_FAST              17 (d)
+            692 LOAD_FAST               18 (r)
+            694 LOAD_FAST               17 (d)
+            696 BINARY_OP                0 (+)
+            700 LIST_APPEND              2
+            702 JUMP_BACKWARD           12 (to 680)
+        >>  704 END_FOR
+            706 STORE_FAST               8 (root)
+            708 STORE_FAST              18 (r)
+            710 STORE_FAST              17 (d)
+
+243     >>  712 BUILD_LIST               0
+            714 STORE_FAST              19 (out)
+
+244         716 LOAD_GLOBAL             27 (NULL + enumerate)
+            726 LOAD_DEREF               1 (positions)
+            728 CALL                     1
+            736 GET_ITER
+        >>  738 FOR_ITER               110 (to 962)
+            742 UNPACK_SEQUENCE          2
+            746 STORE_FAST              20 (i)
+            748 STORE_FAST              21 (position)
+
+245         750 LOAD_FAST                0 (self)
+            752 LOAD_ATTR               28 (_filters)
+            772 LOAD_FAST               20 (i)
+            774 BINARY_SUBSCR
+            778 UNPACK_SEQUENCE          3
+            782 STORE_FAST              22 (fx)
+            784 STORE_FAST              23 (fy)
+            786 STORE_FAST              24 (fz)
+
+246         788 LOAD_FAST               19 (out)
+            790 LOAD_ATTR               31 (NULL|self + append)
+
+248         810 LOAD_FAST                8 (root)
+            812 LOAD_CONST               7 (0)
+            814 BINARY_SUBSCR
+            818 PUSH_NULL
+            820 LOAD_FAST               22 (fx)
+            822 LOAD_FAST               21 (position)
+            824 LOAD_CONST               7 (0)
+            826 BINARY_SUBSCR
+            830 LOAD_FAST                5 (raw_root)
+            832 LOAD_CONST               7 (0)
+            834 BINARY_SUBSCR
+            838 BINARY_OP               10 (-)
+            842 LOAD_FAST                2 (t_s)
+            844 CALL                     2
+            852 BINARY_OP                0 (+)
+
+249         856 LOAD_FAST                8 (root)
+            858 LOAD_CONST               8 (1)
+            860 BINARY_SUBSCR
+            864 PUSH_NULL
+            866 LOAD_FAST               23 (fy)
+            868 LOAD_FAST               21 (position)
+            870 LOAD_CONST               8 (1)
+            872 BINARY_SUBSCR
+            876 LOAD_FAST                5 (raw_root)
+            878 LOAD_CONST               8 (1)
+            880 BINARY_SUBSCR
+            884 BINARY_OP               10 (-)
+            888 LOAD_FAST                2 (t_s)
+            890 CALL                     2
+            898 BINARY_OP                0 (+)
+
+250         902 LOAD_FAST                8 (root)
+            904 LOAD_CONST               9 (2)
+            906 BINARY_SUBSCR
+            910 PUSH_NULL
+            912 LOAD_FAST               24 (fz)
+            914 LOAD_FAST               21 (position)
+            916 LOAD_CONST               9 (2)
+            918 BINARY_SUBSCR
+            922 LOAD_FAST                5 (raw_root)
+            924 LOAD_CONST               9 (2)
+            926 BINARY_SUBSCR
+            930 BINARY_OP               10 (-)
+            934 LOAD_FAST                2 (t_s)
+            936 CALL                     2
+            944 BINARY_OP                0 (+)
+
+247         948 BUILD_TUPLE              3
+
+246         950 CALL                     1
+            958 POP_TOP
+            960 JUMP_BACKWARD          112 (to 738)
+
+244     >>  962 END_FOR
+
+253         964 LOAD_FAST               19 (out)
+            966 RETURN_VALUE
+        >>  968 SWAP                     2
+            970 POP_TOP
+
+223         972 SWAP                     2
+            974 STORE_FAST               4 (axis)
+            976 RERAISE                  0
+        >>  978 SWAP                     2
+            980 POP_TOP
+
+227         982 SWAP                     3
+            984 STORE_FAST               7 (value)
+            986 STORE_FAST               6 (f)
+            988 RERAISE                  0
+        >>  990 SWAP                     2
+            992 POP_TOP
+
+234         994 SWAP                     2
+            996 STORE_FAST               6 (f)
+            998 RERAISE                  0
+        >> 1000 SWAP                     2
+           1002 POP_TOP
+
+238        1004 SWAP                     2
+           1006 STORE_FAST              14 (v)
+           1008 RERAISE                  0
+        >> 1010 SWAP                     2
+           1012 POP_TOP
+
+241        1014 SWAP                     2
+           1016 STORE_FAST              17 (d)
+           1018 RERAISE                  0
+        >> 1020 SWAP                     2
+           1022 POP_TOP
+
+242        1024 SWAP                     3
+           1026 STORE_FAST              17 (d)
+           1028 STORE_FAST              18 (r)
+           1030 RERAISE                  0
+ExceptionTable:
+  34 to 128 -> 968 [2]
+  184 to 220 -> 978 [3]
+  266 to 302 -> 990 [2]
+  470 to 498 -> 1000 [2]
+  604 to 640 -> 1010 [2]
+  676 to 704 -> 1020 [3]

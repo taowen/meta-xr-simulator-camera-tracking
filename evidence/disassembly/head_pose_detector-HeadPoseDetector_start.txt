@@ -1,0 +1,98 @@
+# server/head_pose_detector.py:268-291  HeadPoseDetector.start
+# extraction: Meta XR Simulator v207.1 sidecar, CPython 3.12
+
+  270  LOAD_CONST(0); LOAD_CONST(None); IMPORT_NAME(mediapipe); STORE_FAST(mp)
+  272  LOAD_FAST(mp); LOAD_ATTR(tasks); LOAD_ATTR(BaseOptions); STORE_FAST(BaseOptions)
+  273  LOAD_FAST(mp); LOAD_ATTR(tasks); LOAD_ATTR(vision); LOAD_ATTR(FaceLandmarker); STORE_FAST(FaceLandmarker)
+  274  LOAD_FAST(mp); LOAD_ATTR(tasks); LOAD_ATTR(vision); LOAD_ATTR(FaceLandmarkerOptions); STORE_FAST(FaceLandmarkerOptions)
+  275  LOAD_FAST(mp); LOAD_ATTR(tasks); LOAD_ATTR(vision); LOAD_ATTR(RunningMode); STORE_FAST(VisionRunningMode)
+  277  PUSH_NULL; LOAD_FAST(FaceLandmarkerOptions); KW_NAMES(('base_options', 'running_mode', 'num_faces', 'min_face_detection_confidence', 'min_tracking_confidence', 'output_facial_transformation_matrixes', 'output_face_blendshapes', 'result_callback')); CALL; STORE_FAST(options)
+  278  PUSH_NULL; LOAD_FAST(BaseOptions); LOAD_FAST(self); LOAD_ATTR(_model_path); KW_NAMES(('model_asset_path',)); CALL
+  279  LOAD_FAST(VisionRunningMode); LOAD_ATTR(LIVE_STREAM)
+  280  LOAD_CONST(1)
+  281  LOAD_FAST(self); LOAD_ATTR(_min_detection_confidence)
+  282  LOAD_FAST(self); LOAD_ATTR(_min_tracking_confidence)
+  284  LOAD_CONST(True)
+  287  LOAD_CONST(True)
+  288  LOAD_FAST(self); LOAD_ATTR(_on_result)
+  290  LOAD_FAST(FaceLandmarker); LOAD_ATTR(NULL|self + create_from_options); LOAD_FAST(options); CALL; LOAD_FAST(self); STORE_ATTR(_landmarker)
+  291  LOAD_GLOBAL(logger); LOAD_ATTR(NULL|self + info); LOAD_CONST('MediaPipe FaceLandmarker initialized (head pose mode)'); CALL; POP_TOP; RETURN_CONST(None)
+
+==============================================================================
+verbatim dis listing: server/head_pose_detector.py:268-291 HeadPoseDetector.start
+==============================================================================
+268           0 RESUME                   0
+
+270           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (None)
+              6 IMPORT_NAME              0 (mediapipe)
+              8 STORE_FAST               1 (mp)
+
+272          10 LOAD_FAST                1 (mp)
+             12 LOAD_ATTR                2 (tasks)
+             32 LOAD_ATTR                4 (BaseOptions)
+             52 STORE_FAST               2 (BaseOptions)
+
+273          54 LOAD_FAST                1 (mp)
+             56 LOAD_ATTR                2 (tasks)
+             76 LOAD_ATTR                6 (vision)
+             96 LOAD_ATTR                8 (FaceLandmarker)
+            116 STORE_FAST               3 (FaceLandmarker)
+
+274         118 LOAD_FAST                1 (mp)
+            120 LOAD_ATTR                2 (tasks)
+            140 LOAD_ATTR                6 (vision)
+            160 LOAD_ATTR               10 (FaceLandmarkerOptions)
+            180 STORE_FAST               4 (FaceLandmarkerOptions)
+
+275         182 LOAD_FAST                1 (mp)
+            184 LOAD_ATTR                2 (tasks)
+            204 LOAD_ATTR                6 (vision)
+            224 LOAD_ATTR               12 (RunningMode)
+            244 STORE_FAST               5 (VisionRunningMode)
+
+277         246 PUSH_NULL
+            248 LOAD_FAST                4 (FaceLandmarkerOptions)
+
+278         250 PUSH_NULL
+            252 LOAD_FAST                2 (BaseOptions)
+            254 LOAD_FAST                0 (self)
+            256 LOAD_ATTR               14 (_model_path)
+            276 KW_NAMES                 3 (('model_asset_path',))
+            278 CALL                     1
+
+279         286 LOAD_FAST                5 (VisionRunningMode)
+            288 LOAD_ATTR               16 (LIVE_STREAM)
+
+280         308 LOAD_CONST               4 (1)
+
+281         310 LOAD_FAST                0 (self)
+            312 LOAD_ATTR               18 (_min_detection_confidence)
+
+282         332 LOAD_FAST                0 (self)
+            334 LOAD_ATTR               20 (_min_tracking_confidence)
+
+284         354 LOAD_CONST               5 (True)
+
+287         356 LOAD_CONST               5 (True)
+
+288         358 LOAD_FAST                0 (self)
+            360 LOAD_ATTR               22 (_on_result)
+
+277         380 KW_NAMES                 6 (('base_options', 'running_mode', 'num_faces', 'min_face_detection_confidence', 'min_tracking_confidence', 'output_facial_transformation_matrixes', 'output_face_blendshapes', 'result_callback'))
+            382 CALL                     8
+            390 STORE_FAST               6 (options)
+
+290         392 LOAD_FAST                3 (FaceLandmarker)
+            394 LOAD_ATTR               25 (NULL|self + create_from_options)
+            414 LOAD_FAST                6 (options)
+            416 CALL                     1
+            424 LOAD_FAST                0 (self)
+            426 STORE_ATTR              13 (_landmarker)
+
+291         436 LOAD_GLOBAL             28 (logger)
+            446 LOAD_ATTR               31 (NULL|self + info)
+            466 LOAD_CONST               7 ('MediaPipe FaceLandmarker initialized (head pose mode)')
+            468 CALL                     1
+            476 POP_TOP
+            478 RETURN_CONST             2 (None)
