@@ -149,4 +149,4 @@ py -3.12 .\tools\verify.py --models "C:\Program Files\MetaXRSimulator\v207.1\web
 
 本次检查的 `webcam_tracking_server.exe` SHA-256 为 `d59aa21863beeaac5e2a70277aa5f40347dced6ad2625dab3fc63a55e529530f`。原始行号由打包字节码记录。伪代码省略了线程、时序和异常处理，适用于这个 Windows 样本。
 
-仓库不含 Meta 的二进制与模型文件，也不含反编译后的完整源码：[evidence/](evidence/) 只保留支撑上述结论的函数级字节码节选，[article/](article/) 里的代码是按字节码转写的等价形态。来源与授权说明见 [NOTICE.md](NOTICE.md)。
+仓库不含 Meta 的二进制与模型文件。反编译结果在 [src/](src/)：`server` 包的 15 个模块，由 [tools/decompile.py](tools/decompile.py) 从字节码生成——生成前要先修掉一处厂商改动（`IMPORT_NAME` 被换成了 `CACHE`），再补上 Decompyle++ 缺失的 3.12 语义，补丁在 [tools/pycdc-3.12.patch](tools/pycdc-3.12.patch)。**这不是原始源码**：5 个模块能通过语法解析，其余在推导式（PEP 709）、`with`、`try` 嵌套处有标注的残缺，每个文件的 docstring 与 [src/README.md](src/README.md) 都写明了状态。逐行证据仍在 [evidence/](evidence/)，[article/](article/) 是按字节码转写的等价形态。来源与授权说明见 [NOTICE.md](NOTICE.md)。

@@ -8,9 +8,16 @@
 
 - **不含** `webcam_tracking_server.exe`、`SIMULATOR.dll` 或任何其他 Meta 二进制文件。
 - **不含** `hand_landmarker.task` / `face_landmarker.task` 模型文件。
-- **不含** 反编译后可直接使用的完整源码（Meta 的 `server.*` 模块源码）。
 
 `tools/extract.py` 只是从**你本地的安装目录**读取你自己的副本，解包到 `build/`（已 gitignore）。要复现，你必须自己持有该授权副本。
+
+## `src/` 里有什么
+
+`src/` 是 `server` 包的**机器反编译结果**，由 [tools/decompile.py](tools/decompile.py) 从解包出的字节码生成（流程与已知缺陷见 [src/README.md](src/README.md)）。它不是 Meta 的原始源码，也不保证语义等价：15 个模块里 5 个能通过 Python 语法解析，其余在推导式、`with`、`try` 嵌套等处有明确标注的残缺。
+
+保留它的理由是**可核查性**：文中每条结论都要能落回具体代码，而读函数体比读指令表更直接。同样内容的指令级证据在 `evidence/`，两者可以互相校验。
+
+如果这种尺度不合适，见文末的移除请求。
 
 ## 包含什么，以及为什么
 

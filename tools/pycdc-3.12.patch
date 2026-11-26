@@ -1,0 +1,312 @@
+diff --git a/ASTree.cpp b/ASTree.cpp
+index f837152..989224f 100644
+--- a/ASTree.cpp
++++ b/ASTree.cpp
+@@ -50,6 +50,31 @@ static PycRef<ASTNode> StackPopTop(FastStack& stack)
+  *  here, try to guess if just finished else statement is part of if-expression (ternary operator)
+  *  if it is, remove statements from the block and put a ternary node on top of stack
+  */
++/* The class node keeps its name as a plain string object, which would print as
++ * `class 'Foo':`. Turn it into a name node when hoisting a decorated class. */
++static PycRef<ASTNode> ClassNameNode(PycRef<ASTNode> cls)
++{
++    PycRef<ASTNode> name = cls.cast<ASTClass>()->name();
++    if (name.type() == ASTNode::NODE_OBJECT) {
++        PycRef<PycObject> obj = name.cast<ASTObject>()->object();
++        if (obj != nullptr) {
++            switch (obj->type()) {
++            case PycObject::TYPE_STRING:
++            case PycObject::TYPE_UNICODE:
++            case PycObject::TYPE_ASCII:
++            case PycObject::TYPE_INTERNED:
++            case PycObject::TYPE_ASCII_INTERNED:
++            case PycObject::TYPE_SHORT_ASCII:
++            case PycObject::TYPE_SHORT_ASCII_INTERNED:
++                return new ASTName(obj.cast<PycString>());
++            default:
++                break;
++            }
++        }
++    }
++    return name;
++}
++
+ static void CheckIfExpr(FastStack& stack, PycRef<ASTBlock> curblock)
+ {
+     if (stack.empty())
+@@ -541,6 +566,10 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                 stack.pop();
+                 int loadbuild_type = loadbuild.type();
+                 if (loadbuild_type == ASTNode::NODE_LOADBUILDCLASS) {
++                    /* 3.12 puts a PUSH_NULL in front of LOAD_BUILD_CLASS; it
++                     * belongs to this call, not to whatever consumes the class. */
++                    if (stack.top() == nullptr)
++                        stack.pop();
+                     PycRef<ASTNode> call = new ASTCall(function, pparamList, kwparamList);
+                     stack.push(new ASTClass(call, new ASTTuple(bases), name));
+                     stack_hist.pop();
+@@ -594,6 +623,14 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+ 
+                             pparamList.push_front(decor_name);
+                         }
++                    } else if (param.type() == ASTNode::NODE_CLASS) {
++                        /* A class decorator. Hoist the class statement and let the
++                         * call consume the name, exactly as for functions above;
++                         * otherwise the class node would be printed as an
++                         * expression and its body would be lost. */
++                        PycRef<ASTNode> class_name = ClassNameNode(param);
++                        curblock->append(new ASTStore(param, class_name));
++                        pparamList.push_front(class_name);
+                     } else {
+                         pparamList.push_front(param);
+                     }
+@@ -603,6 +640,26 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                 if ((opcode == Pyc::CALL_A || opcode == Pyc::INSTRUMENTED_CALL_A) &&
+                         stack.top() == nullptr) {
+                     stack.pop();
++                } else if (mod->verCompare(3, 12) >= 0) {
++                    /* 3.12 packs a one-argument call into the "self" slot with
++                     * argc == 0; that is how decorators are applied. What we
++                     * just popped is the argument, not the callable. */
++                    PycRef<ASTNode> arg = func;
++                    func = stack.top();
++                    stack.pop();
++                    if (arg.type() == ASTNode::NODE_FUNCTION) {
++                        PycRef<ASTNode> fun_code = arg.cast<ASTFunction>()->code();
++                        PycRef<PycCode> code_src = fun_code.cast<ASTObject>()->object().cast<PycCode>();
++                        PycRef<ASTNode> decor_name = new ASTName(code_src->name());
++                        curblock->append(new ASTStore(arg, decor_name));
++                        pparamList.push_front(decor_name);
++                    } else if (arg.type() == ASTNode::NODE_CLASS) {
++                        PycRef<ASTNode> class_name = ClassNameNode(arg);
++                        curblock->append(new ASTStore(arg, class_name));
++                        pparamList.push_front(class_name);
++                    } else {
++                        pparamList.push_front(arg);
++                    }
+                 }
+ 
+                 stack.push(new ASTCall(func, pparamList, kwparamList));
+@@ -711,6 +768,14 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+ 
+                             pparamList.push_front(decor_name);
+                         }
++                    } else if (param.type() == ASTNode::NODE_CLASS) {
++                        /* A class decorator. Hoist the class statement and let the
++                         * call consume the name, exactly as for functions above;
++                         * otherwise the class node would be printed as an
++                         * expression and its body would be lost. */
++                        PycRef<ASTNode> class_name = ClassNameNode(param);
++                        curblock->append(new ASTStore(param, class_name));
++                        pparamList.push_front(class_name);
+                     } else {
+                         pparamList.push_front(param);
+                     }
+@@ -1128,6 +1193,8 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+         case Pyc::POP_JUMP_IF_TRUE_A:
+         case Pyc::POP_JUMP_FORWARD_IF_FALSE_A:
+         case Pyc::POP_JUMP_FORWARD_IF_TRUE_A:
++        case Pyc::POP_JUMP_IF_NONE_A:
++        case Pyc::POP_JUMP_IF_NOT_NONE_A:
+         case Pyc::INSTRUMENTED_POP_JUMP_IF_FALSE_A:
+         case Pyc::INSTRUMENTED_POP_JUMP_IF_TRUE_A:
+             {
+@@ -1146,9 +1213,20 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                     popped = ASTCondBlock::PRE_POPPED;
+                 }
+ 
++                if (opcode == Pyc::POP_JUMP_IF_NONE_A
++                        || opcode == Pyc::POP_JUMP_IF_NOT_NONE_A) {
++                    /* The condition on the stack is the *operand* of an implicit
++                     * "is None" / "is not None" test, so synthesise the compare. */
++                    stack.pop();
++                    popped = ASTCondBlock::PRE_POPPED;
++                    cond = new ASTCompare(cond, new ASTObject(Pyc_None),
++                                          opcode == Pyc::POP_JUMP_IF_NOT_NONE_A
++                                                  ? ASTCompare::CMP_IS
++                                                  : ASTCompare::CMP_IS_NOT);
++                }
++
+                 /* Store the current stack for the else statement(s) */
+                 stack_hist.push(stack);
+-
+                 if (opcode == Pyc::JUMP_IF_FALSE_OR_POP_A
+                         || opcode == Pyc::JUMP_IF_TRUE_OR_POP_A) {
+                     /* Pop condition only if condition is met */
+@@ -1173,6 +1251,8 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                         || opcode == Pyc::POP_JUMP_FORWARD_IF_FALSE_A) {
+                     /* Offset is relative in these cases */
+                     offs += pos;
++                    if (mod->verCompare(3, 12) >= 0)
++                        offs += sizeof(uint16_t); /* ... to the next instruction */
+                 }
+ 
+                 if (cond.type() == ASTNode::NODE_COMPARE
+@@ -1585,6 +1665,8 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+             stack.push(new ASTLoadBuildClass(new PycObject()));
+             break;
+         case Pyc::LOAD_CLOSURE_A:
++        case Pyc::MAKE_CELL_A:
++        case Pyc::RETURN_GENERATOR:
+             /* Ignore this */
+             break;
+         case Pyc::LOAD_CONST_A:
+@@ -1608,11 +1690,18 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+             stack.push(new ASTName(code->getCellVar(mod, operand)));
+             break;
+         case Pyc::LOAD_FAST_A:
++        case Pyc::LOAD_FAST_CHECK_A:
+             if (mod->verCompare(1, 3) < 0)
+                 stack.push(new ASTName(code->getName(operand)));
+             else
+                 stack.push(new ASTName(code->getLocal(operand)));
+             break;
++        case Pyc::LOAD_FAST_AND_CLEAR_A:
++            /* 3.12 inlined comprehension prologue: the loop variable is saved
++             * here and restored after the loop. Comprehension recovery is not
++             * implemented, so read it as a plain local. */
++            stack.push(new ASTName(code->getLocal(operand)));
++            break;
+         case Pyc::LOAD_FAST_LOAD_FAST_A:
+             stack.push(new ASTName(code->getLocal(operand >> 4)));
+             stack.push(new ASTName(code->getLocal(operand & 0xF)));
+@@ -1662,15 +1751,45 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                 }
+ 
+                 ASTFunction::defarg_t defArgs, kwDefArgs;
+-                const int defCount = operand & 0xFF;
+-                const int kwDefCount = (operand >> 8) & 0xFF;
+-                for (int i = 0; i < defCount; ++i) {
+-                    defArgs.push_front(stack.top());
+-                    stack.pop();
+-                }
+-                for (int i = 0; i < kwDefCount; ++i) {
+-                    kwDefArgs.push_front(stack.top());
+-                    stack.pop();
++                if (mod->verCompare(3, 6) >= 0) {
++                    /* From 3.6 on, the operand is a flag word and the objects it
++                     * announces sit on the stack, deepest first:
++                     *   defaults, kwdefaults, annotations, closure, code, qualname
++                     * (the qualname push was dropped again in 3.11, which the
++                     * peek above already accounts for). */
++                    if (operand & 0x08) {
++                        stack.pop(); /* closure */
++                    }
++                    if (operand & 0x04) {
++                        stack.pop(); /* annotations */
++                    }
++                    if (operand & 0x02) {
++                        PycRef<ASTNode> kwdefs = stack.top();
++                        stack.pop();
++                        if (kwdefs.type() == ASTNode::NODE_MAP) {
++                            for (const auto& kv : kwdefs.cast<ASTMap>()->values())
++                                kwDefArgs.push_back(kv.second);
++                        }
++                    }
++                    if (operand & 0x01) {
++                        PycRef<ASTNode> defs = stack.top();
++                        stack.pop();
++                        if (defs.type() == ASTNode::NODE_TUPLE) {
++                            for (const auto& val : defs.cast<ASTTuple>()->values())
++                                defArgs.push_back(val);
++                        }
++                    }
++                } else {
++                    const int defCount = operand & 0xFF;
++                    const int kwDefCount = (operand >> 8) & 0xFF;
++                    for (int i = 0; i < defCount; ++i) {
++                        defArgs.push_front(stack.top());
++                        stack.pop();
++                    }
++                    for (int i = 0; i < kwDefCount; ++i) {
++                        kwDefArgs.push_front(stack.top());
++                        stack.pop();
++                    }
+                 }
+                 stack.push(new ASTFunction(fun_code, defArgs, kwDefArgs));
+             }
+@@ -1954,7 +2073,12 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                     curblock = blocks.top();
+                     curblock->append(prev.cast<ASTNode>());
+ 
+-                    bc_next(source, mod, opcode, operand, pos);
++                    /* Up to 3.11 the instruction after the return is the block
++                     * terminator (POP_BLOCK / the jump), so swallow it. 3.12 has
++                     * no POP_BLOCK and that instruction is the first statement
++                     * after the branch. */
++                    if (mod->verCompare(3, 12) < 0)
++                        bc_next(source, mod, opcode, operand, pos);
+                 }
+             }
+             break;
+@@ -2197,7 +2321,10 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+                     stack.pop();
+                     PycRef<ASTNode> name = new ASTName(code->getCellVar(mod, operand));
+ 
+-                    if (value.type() == ASTNode::NODE_CHAINSTORE) {
++                    if (curblock->blktype() == ASTBlock::BLK_FOR
++                            && !curblock->inited()) {
++                        curblock.cast<ASTIterBlock>()->setIndex(name);
++                    } else if (value.type() == ASTNode::NODE_CHAINSTORE) {
+                         append_to_chain_store(value, name, stack, curblock);
+                     } else {
+                         curblock->append(new ASTStore(value, name));
+@@ -2603,6 +2730,28 @@ PycRef<ASTNode> BuildFromCode(PycRef<PycCode> code, PycModule* mod)
+             break;
+         case Pyc::SWAP_A:
+             {
++                /* SWAP(i) exchanges TOS with the i-th item. When the depth pycdc
++                 * models is one short (3.11+ keeps the handled exception on the
++                 * stack, which we deliberately never push) fall back to the old
++                 * unpacking hack instead. */
++                if (stack.depth() < operand) {
++                    /* The slot SWAP wants to reach is the exception state that
++                     * 3.11+ keeps on the interpreter stack; we never push it, so
++                     * the swap only shuffles bookkeeping we do not model. */
++                    break;
++                }
++                if (stack.top(operand) != nullptr) {
++                    std::vector<PycRef<ASTNode>> items(operand);
++                    for (int i = 0; i < operand; i++) {
++                        items[i] = stack.top();
++                        stack.pop();
++                    }
++                    std::swap(items.front(), items.back());
++                    for (int i = operand - 1; i >= 0; i--)
++                        stack.push(items[i]);
++                    break;
++                }
++
+                 unpack = operand;
+                 ASTTuple::value_t values;
+                 ASTTuple::value_t next_tuple;
+@@ -3491,7 +3640,12 @@ void print_src(PycRef<ASTNode> node, PycModule* mod, std::ostream& pyc_output)
+         {
+             print_src(node.cast<ASTSubscr>()->name(), mod, pyc_output);
+             pyc_output << "[";
+-            print_src(node.cast<ASTSubscr>()->key(), mod, pyc_output);
++            PycRef<ASTNode> key = node.cast<ASTSubscr>()->key();
++            if (key.type() == ASTNode::NODE_TUPLE) {
++                /* image[:, 0] - the tuple is implicit, parens would be wrong */
++                key.cast<ASTTuple>()->setRequireParens(false);
++            }
++            print_src(key, mod, pyc_output);
+             pyc_output << "]";
+         }
+         break;
+diff --git a/FastStack.h b/FastStack.h
+index b91ec71..9b3abe4 100644
+--- a/FastStack.h
++++ b/FastStack.h
+@@ -61,6 +61,11 @@ public:
+         return m_ptr == -1;
+     }
+ 
++    int depth() const
++    {
++        return m_ptr + 1;
++    }
++
+ private:
+     std::vector<PycRef<ASTNode>> m_stack;
+     int m_ptr;
